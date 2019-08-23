@@ -1,0 +1,6 @@
+.idea/
+*/__pycacahe__/*.pyc
+project.egg-info
+junyang_data/data_handler/_trial_temp
+*.pyc
+junyang_data/other_data_handler/data_file/*
