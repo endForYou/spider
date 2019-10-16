@@ -17,12 +17,12 @@ NEWSPIDER_MODULE = 'junyang_spider.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'junyang_spider (+http://www.yourdomain.com)'
-
+MEDIA_ALLOW_REDIRECTS = True
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 5
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -33,7 +33,7 @@ ROBOTSTXT_OBEY = False
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-# COOKIES_ENABLED = False
+# COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
@@ -41,8 +41,7 @@ ROBOTSTXT_OBEY = False
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-    'Host': 'search.51job.com',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3493.3 Safari/537.36',
+    'User-Agent': ' Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36',
 }
 
 # Enable or disable spider middlewares
@@ -71,6 +70,7 @@ DEFAULT_REQUEST_HEADERS = {
 ITEM_PIPELINES = {
     'junyang_spider.pipelines.MongoPipeline': 200,
     'junyang_spider.pipelines.MysqlPipeline': 300,
+    'junyang_spider.pipelines.PaperEWTPipeline': 200
     # 'scrapy_redis.pipelines.RedisPipeline': 300,
 }
 

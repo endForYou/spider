@@ -248,3 +248,13 @@ class SchoolItem(scrapy.Item):
     type = scrapy.Field()
     year = scrapy.Field()
     province = scrapy.Field()
+
+
+class PaperEWTItem(scrapy.Item):
+    data_category = scrapy.Field()
+    data_type = scrapy.Field()
+    version = scrapy.Field()
+    subject = scrapy.Field()
+    grade = scrapy.Field()
+    upload_time = scrapy.Field()
+    file_url = scrapy.Field()

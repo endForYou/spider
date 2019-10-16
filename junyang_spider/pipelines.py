@@ -34,6 +34,26 @@ class FoJobPipeline(object):
         return item
 
 
+# class SchoolBadgePipeline(object):
+#     def process_item(self, item, spider):
+#         images = []
+#         # 所有图片放在一个文件夹下
+#         dir_path = '{}'.format(IMAGES_STORE)
+#         if not os.path.exists(dir_path) and len(item['src']) != 0:
+#             os.mkdir(dir_path)
+#         for jpg_url, name, num in zip(item['src'], item['school_name'], range(0, 100)):
+#             file_name = name + str(num)
+#             file_path = '{}//{}'.format(dir_path, file_name)
+#             images.append(file_path)
+#             if os.path.exists(file_path) or os.path.exists(file_name):
+#                 continue
+#             with open('{}//{}.jpg'.format(dir_path, file_name), 'wb') as f:
+#                 req = requests.get(jpg_url, headers=header)
+#                 f.write(req.content)
+#
+#         return item
+
+
 class RegionPipeline(object):
     regionInsert = "insert into region(name,code) values('{name}','{code}')"
     functionInsert = "insert into function(name,code) values('{name}','{code}')"
@@ -177,3 +197,8 @@ class MysqlPipeline(MongoPipeline):
     def close_spider(self, spider):
         self.cursor.close()
         self.connect.close()
+
+
+class PaperEWTPipeline:
+    def process_item(self, item, spider):
+        return item
