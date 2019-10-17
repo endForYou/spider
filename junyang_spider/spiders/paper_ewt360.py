@@ -18,19 +18,23 @@ class PaperEWT360(scrapy.Spider):
     custom_settings = {
         'ITEM_PIPELINES': {'junyang_spider.pipelines.PaperEWTPipeline': 200}
     }
-    cookies = {
-        'Cookie': 'big_data_cookie_id=c127ee56-2676-493a-6684-f90d051e9258%7C1571208883630; Hm_lvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571208719; Hm_lvt_5261308991055a39373a5ccf8edd3695=1571208719; _ga=GA1.2.1210832376.1571208885; _gid=GA1.2.1144140080.1571208885; UserID=15045901; user=tk=15045901-1-10ccccd332dc5e98&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgSxY3PAl/r0WjzKOPmgmbE6AoPV2iFiO53u%0Ax/fI6yCiAjhPOsB9UmgdYvrGV7VCkUZTi6N6e8D0RjxvtNaAIhdRKqOhqnXgg3G7lVtITZXJkg==; ewt_user=tk=15045901-1-10ccccd332dc5e98&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgSxY3PAl/r0WjzKOPmgmbE6AoPV2iFiO53u%0Ax/fI6yCiAjhPOsB9UmgdYvrGV7VCkUZTi6N6e8D0RjxvtNaAIhdRKqOhqnXgg3G7lVtITZXJkg==; token=15045901-1-10ccccd332dc5e98; Hm_lvt_=1571208719,1571208885,1571216284; Hm_lpvt_=1571216297; Hm_lpvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571216297; Hm_lpvt_5261308991055a39373a5ccf8edd3695=1571216297 '}
+
+    headers = {
+        'Cookie': "big_data_cookie_id=5932bf48-8421-dcd4-fca2-11c5f7247922%7C1571283046904; Hm_lvt_=1571283047; Hm_mstid_=62075284295976; _ga=GA1.2.1517150177.1571283047; _gid=GA1.2.2042020364.1571283047; Hm_lvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571283048; Hm_lvt_5261308991055a39373a5ccf8edd3695=1571283048; UserID=15045901; user=tk=15045901-1-2205186270f9c379&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgTyrQvtEdgy60irHXjacgdaD3imiX9jABy9%0A61w6GB6nOIej2MWapRiDEFjegLZ6RSZcUB4ROC+eqX/xZlKtcpnkSDpR5UHSAN+dkwMKgV8mOg==; ewt_user=tk=15045901-1-2205186270f9c379&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgTyrQvtEdgy60irHXjacgdaD3imiX9jABy9%0A61w6GB6nOIej2MWapRiDEFjegLZ6RSZcUB4ROC+eqX/xZlKtcpnkSDpR5UHSAN+dkwMKgV8mOg==; token=15045901-1-2205186270f9c379; Hm_lpvt_=1571290984; Hm_lpvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571290984; Hm_lpvt_5261308991055a39373a5ccf8edd3695=1571290984",
+        'User-Agent': "PostmanRuntime/7.18.0",
+        'Accept': "*/*",
+        'Cache-Control': "no-cache",
+        'Postman-Token': "8c2edf16-39c6-48d8-94c5-c7142412291f,1a9b8e21-c718-4aa1-a454-b237d6687ee5",
+        'Host': "www.ewt360.com",
+        'Accept-Encoding': "gzip, deflate",
+        'cache-control': "no-cache"
+    }
 
     def start_requests(self):
-        requests_header = {
-            'Host': 'www.ewt360.com',
-            'Sec-Fetch-User': '?1',
-            'Cookie': 'big_data_cookie_id=0adcfa69-faef-cf96-9a00-3c1d3a2951ab%7C1571221516820; Hm_mstid_=364082011237368; Hm_lvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571221517; Hm_lvt_5261308991055a39373a5ccf8edd3695=1571221517; _ga=GA1.2.335479032.1571221517; _gid=GA1.2.1367627752.1571221517; UserID=15045901; user=tk=15045901-1-ade7b2cc3bb01ae8&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgS8flZfN58nLjzXhJJHWJ5paaGEwobNo9Xu%0A2UMfJnwAo8nitAZdiaGMCIZYkpHID6QVkBx0k32A2kouSJtWPTOmumMyoNzVDxvqSxxPK4q5cQ==; ewt_user=tk=15045901-1-ade7b2cc3bb01ae8&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgS8flZfN58nLjzXhJJHWJ5paaGEwobNo9Xu%0A2UMfJnwAo8nitAZdiaGMCIZYkpHID6QVkBx0k32A2kouSJtWPTOmumMyoNzVDxvqSxxPK4q5cQ==; token=15045901-1-ade7b2cc3bb01ae8; Hm_lvt_=1571221517,1571221647; _gat=1; Hm_lpvt_=1571221649; Hm_lpvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571221649; Hm_lpvt_5261308991055a39373a5ccf8edd3695=1571221649'
-        }
 
-        for i in range(1, 2):
+        for i in range(2, 3):
             url = "https://www.ewt360.com/Review/Lists?page=%s" % i
-            yield scrapy.Request(url, method="GET", headers=requests_header, callback=self.parse)
+            yield scrapy.Request(url, method="GET", headers=self.headers, callback=self.parse)
 
     def parse(self, response):
         # item = PaperEWTItem()
@@ -38,11 +42,6 @@ class PaperEWT360(scrapy.Spider):
         # item['data_category'] = response.css(
         #     "div.videoFZ > table > tbody > tr:nth-child(1) > td::text").extract_first()
         # print(item)
-        requests_header = {
-            'Host': 'www.ewt360.com',
-            'Sec-Fetch-User': '?1',
-            'Cookie': 'big_data_cookie_id=0adcfa69-faef-cf96-9a00-3c1d3a2951ab%7C1571221516820; Hm_mstid_=364082011237368; Hm_lvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571221517; Hm_lvt_5261308991055a39373a5ccf8edd3695=1571221517; _ga=GA1.2.335479032.1571221517; _gid=GA1.2.1367627752.1571221517; UserID=15045901; user=tk=15045901-1-ade7b2cc3bb01ae8&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgS8flZfN58nLjzXhJJHWJ5paaGEwobNo9Xu%0A2UMfJnwAo8nitAZdiaGMCIZYkpHID6QVkBx0k32A2kouSJtWPTOmumMyoNzVDxvqSxxPK4q5cQ==; ewt_user=tk=15045901-1-ade7b2cc3bb01ae8&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uT6MmsUKCjgS8flZfN58nLjzXhJJHWJ5paaGEwobNo9Xu%0A2UMfJnwAo8nitAZdiaGMCIZYkpHID6QVkBx0k32A2kouSJtWPTOmumMyoNzVDxvqSxxPK4q5cQ==; token=15045901-1-ade7b2cc3bb01ae8; Hm_lvt_=1571221517,1571221647; _gat=1; Hm_lpvt_=1571221649; Hm_lpvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571221649; Hm_lpvt_5261308991055a39373a5ccf8edd3695=1571221649'
-        }
         for paper in response.css('li.pngFix'):
             href = paper.css("a::attr('href')")
 
@@ -58,7 +57,7 @@ class PaperEWT360(scrapy.Spider):
             #     'Accept-Encoding': 'gzip, deflate',
             #     'Connection': 'keep-alive'
             # }
-            yield scrapy.Request(url, method="GET",callback=self.parse_contents, headers=requests_header)
+            yield scrapy.Request(url, method="GET", callback=self.parse_contents, headers=self.headers)
 
         #     if paper_url.find("http") != -1:
         #         item = YouzySchoolBadgeItem()
