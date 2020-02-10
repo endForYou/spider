@@ -1,4 +1,4 @@
 from scrapy import cmdline
 
 
-cmdline.execute("scrapy crawl paper_ewt360".split())
+cmdline.execute("scrapy crawl ncda_spider".split())

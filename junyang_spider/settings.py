@@ -27,7 +27,7 @@ CONCURRENT_REQUESTS = 1
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 1
+DOWNLOAD_DELAY = 0
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
@@ -52,9 +52,9 @@ DOWNLOAD_DELAY = 1
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#    'junyang_spider.middlewares.JunyangSpiderDownloaderMiddleware': 543,
-# }
+DOWNLOADER_MIDDLEWARES = {
+    'junyang_spider.middlewares.JunyangSpiderDownloaderMiddleware': 543,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -68,10 +68,12 @@ DOWNLOAD_DELAY = 1
 #    'junyang_spider.pipelines.JunyangSpiderPipeline': 300,
 # }
 ITEM_PIPELINES = {
-    'junyang_spider.pipelines.MongoPipeline': 200,
-    'junyang_spider.pipelines.MysqlPipeline': 300,
-    'junyang_spider.pipelines.PaperEWTPipeline': 200
-    # 'scrapy_redis.pipelines.RedisPipeline': 300,
+    # 'junyang_spider.pipelines.MongoPipeline': 200,
+    # 'junyang_spider.pipelines.MysqlPipeline': 300,
+    # 'junyang_spider.pipelines.PaperEWTPipeline': 200,
+    # 'junyang_spider.pipelines.files.FilesPipeline': 1
+    # 'junyang_spider.pipelines.RedisPipeline': 300,
+    'junyang_spider.pipelines.NcdaPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -100,21 +102,30 @@ INSERT_LIMIT = 0
 # MYSQL_DBNAME = '51job'
 # MYSQL_USER = 'job51'
 # MYSQL_PASSWD = '65jaF6vSZUAd20sD'
-ENV = "dev"
-if ENV == "dev":
-    MYSQL_HOST = 'localhost'
-    MYSQL_DBNAME = '51job'
-    MYSQL_USER = 'root'
-    MYSQL_PASSWD = 'qwerty'
-    MYSQL_PORT = 3306
-    MONGO_URI = "mongodb://root:{pwd}@39.104.185.107:27017/".format(pwd=quote_plus("luoziming@2019!"))
-    MONGO_DATABASE = '51Job'
-else:
-    # online
-    MYSQL_HOST = 'rm-hp384ht74xir31xdazo.mysql.huhehaote.rds.aliyuncs.com'
-    MYSQL_DBNAME = '51job'
-    MYSQL_USER = 'job51'
-    MYSQL_PASSWD = '65jaF6vSZUAd20sD'
-    MYSQL_PORT = 3306
-    MONGO_URI = "mongodb://root:{pwd}@39.104.185.107:27017/".format(pwd=quote_plus("luoziming@2019!"))
-    MONGO_DATABASE = '51Job'
+# ENV = "pro"
+# if ENV == "dev":
+#     MYSQL_HOST = 'localhost'
+#     MYSQL_DBNAME = '51job'
+#     MYSQL_USER = 'root'
+#     MYSQL_PASSWD = 'qwerty'
+#     MYSQL_PORT = 3306
+#     MONGO_URI = "mongodb://root:{pwd}@39.104.185.107:27017/".format(pwd=quote_plus("luoziming@2019!"))
+#     MONGO_DATABASE = '51Job'
+# else:
+# online
+# MYSQL_HOST = 'rm-hp384ht74xir31xdazo.mysql.huhehaote.rds.aliyuncs.com'
+# MYSQL_DBNAME = '51job'
+# MYSQL_USER = 'job51'
+# MYSQL_PASSWD = '65jaF6vSZUAd20sD'
+# MYSQL_PORT = 3306
+# MONGO_URI = "mongodb://root:{pwd}@39.104.185.107:27017/".format(pwd=quote_plus("luoziming@2019!"))
+# MONGO_DATABASE = '51Job'
+MYSQL_HOST = '39.104.123.45'
+MYSQL_DBNAME = 'dbresource'
+MYSQL_USER = 'resource'
+MYSQL_PASSWD = "vX1+U4N7HVZaiUhHQkV+oIOyHTw="
+MYSQL_PORT = 3306
+MYSQL_CHARSET = 'utf8'
+# MONGO_URI = "mongodb://root:{pwd}@39.104.185.107:27017/".format(pwd=quote_plus("luoziming@2019!"))
+# MONGO_DATABASE = '51Job'
+# FILE_STORE = 'D:\\totransfer'

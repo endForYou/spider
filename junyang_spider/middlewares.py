@@ -69,6 +69,7 @@ class JunyangSpiderDownloaderMiddleware(object):
         return s
 
     def process_request(self, request, spider):
+        request.meta['proxy'] = "http://127.0.0.1:3128"
         # Called for each request that goes through the downloader
         # middleware.
 
