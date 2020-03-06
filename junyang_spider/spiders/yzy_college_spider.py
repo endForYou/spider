@@ -25,10 +25,12 @@ class YzyCollegeSpider(scrapy.Spider):
     def start_requests(self):
         for page in range(1, 146):
             url = self.base_url + "/tzy/search/colleges/collegeList?page=" + str(page)
-            yield scrapy.Request(url, method="GET", dont_filter=True)
+
+            yield scrapy.Request(url, meta={"sid": page}, method="GET", dont_filter=True)
 
     def parse(self, response):
         # 学校列表
+        sid = response.meta['sid']
         for e in response.css("li.clearfix"):
             url = e.css("div.top>a::attr('href')").extract_first()
             college_id = e.css("div.top>a::attr('data-num')").extract_first()
@@ -37,6 +39,7 @@ class YzyCollegeSpider(scrapy.Spider):
             province = e.css("li.quarter:nth-of-type(6)::text").extract_first()
             # print(college_name)
             item = YzyCollegeItem()
+            item['sid'] = sid
             item['college_id'] = college_id
             item['college_level'] = college_level
             item['college_name'] = college_name

@@ -301,6 +301,7 @@ class YzyCollegeItem(scrapy.Item):
     school_desc = scrapy.Field()
     college_level = scrapy.Field()
     province = scrapy.Field()
+    sid = scrapy.Field()
 
 
 class YzyCollegeDetailItem(scrapy.Item):

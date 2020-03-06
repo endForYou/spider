@@ -409,8 +409,8 @@ class YzyCollegePipeline(object):
     def insert_into(self, cursor, item):
         # 创建sql语句
         sql = '''INSERT INTO college_yzy (is_public,college_name,creation_time,school_type,belong_to,is_undergraduate,
-province,address,master_station_count,doctor_station_count,school_desc,college_id,college_level)
- VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+province,address,master_station_count,doctor_station_count,school_desc,college_id,college_level,sid)
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 '''
         # 执行sql语句
         is_public = item['is_public']
@@ -426,9 +426,10 @@ province,address,master_station_count,doctor_station_count,school_desc,college_i
         college_id = item['college_id']
         college_level = item['college_level']
         province = item['province']
+        sid = item['sid']
         cursor.execute(sql, (is_public, college_name, creation_time, school_type, belong_to, is_undergraduate,
                              province, address, master_station_count, doctor_station_count, school_desc, college_id,
-                             college_level))
+                             college_level, sid))
         # 错误函数
 
     def handle_error(self, failure, item, spider):
