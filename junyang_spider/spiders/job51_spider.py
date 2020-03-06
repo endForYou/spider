@@ -64,6 +64,7 @@ class Job51Spider(scrapy.Spider):
             meta_data = {
                 'key_word': key_word,
             }
+
             yield scrapy.FormRequest(url, meta=meta_data, formdata=data, method="GET")
 
     def login(self):

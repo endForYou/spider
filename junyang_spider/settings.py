@@ -22,12 +22,12 @@ MEDIA_ALLOW_REDIRECTS = True
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 1
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 0
+DOWNLOAD_DELAY = 0.5
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
@@ -39,16 +39,16 @@ DOWNLOAD_DELAY = 0
 # TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-# DEFAULT_REQUEST_HEADERS = {
-#     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-#     'User-Agent': ' Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36',
-# }
+DEFAULT_REQUEST_HEADERS = {
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+    'User-Agent': ' Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36',
+}
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-# SPIDER_MIDDLEWARES = {
-#    'junyang_spider.middlewares.JunyangSpiderSpiderMiddleware': 543,
-# }
+SPIDER_MIDDLEWARES = {
+    'junyang_spider.middlewares.JunyangSpiderSpiderMiddleware': 543,
+}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -73,7 +73,11 @@ ITEM_PIPELINES = {
     # 'junyang_spider.pipelines.PaperEWTPipeline': 200,
     # 'junyang_spider.pipelines.files.FilesPipeline': 1
     # 'junyang_spider.pipelines.RedisPipeline': 300,
-    'junyang_spider.pipelines.NcdaPipeline': 300,
+    # 'junyang_spider.pipelines.NcdaPipeline': 300,
+    'junyang_spider.pipelines.YzyCollegePipeline': 300,
+    'junyang_spider.pipelines.YzyCollegeDetailPipline': 200,
+    'junyang_spider.pipelines.YzyCollegeEnrollCodePipline': 100,
+    'junyang_spider.pipelines.YzyCollegeScorelinePipline': 100,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -121,7 +125,7 @@ INSERT_LIMIT = 0
 # MONGO_URI = "mongodb://root:{pwd}@39.104.185.107:27017/".format(pwd=quote_plus("luoziming@2019!"))
 # MONGO_DATABASE = '51Job'
 MYSQL_HOST = '39.104.123.45'
-MYSQL_DBNAME = 'dbresource'
+MYSQL_DBNAME = 'zhiyuan_new'
 MYSQL_USER = 'resource'
 MYSQL_PASSWD = "vX1+U4N7HVZaiUhHQkV+oIOyHTw="
 MYSQL_PORT = 3306

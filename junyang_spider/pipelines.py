@@ -205,6 +205,236 @@ class PaperEWTPipeline:
         return item
 
 
+class YzyCollegeDetailPipline(object):
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO yzy_college (id,yzy_college_id,isGraduate,isSport,isRecommendedStudent,isNationalDefenceStudent,
+    isIndependentRecruitment,tags,bxType,star,vrUrl,bannerUrl,webSite,admissionsWebSite,admissionsEmail,address,phone,postCode,importClassic
+    ,department,faculty,addressCoordFromBaidu,numberOfStudents,numberOfBen,numberOfYan,numberOfBo,numberOfCJXZ,numberOfYuan,
+   pointsOfBSH,countOfFollow, countOfFill,countOfAP,introduction,keyMajors,collegeDepartments,numId,code,logoId,logoUrl,
+   provinceId,cityId,provinceName,cityName,rankOfCn,cnName,enName,femaleRate,maleRate,shortName,nameUsedBefore,creation,
+   educationId,typeId,level,nature,classify,belong,belongFull,isArt,isSingleRecruit,bxcc,is985,is211,isKey,isProvincial,
+   isBTProvince,isDependent,isCivilianRun,isGZDZ,hits,collegeRule,majorRule,firstClass,year,line,plan,rankOfWorld,rankSummary,
+   pointsOfShuo,pointsOfBo,type,education,formatHits,summary,employmentRate,keyMajorNum,departmentNum,keySubjectQTY )
+     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s
+     ,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s
+     ,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    '''
+        # 执行sql语句
+        college_detail_id = item['college_detail_id']
+        yzy_college_id = item['yzy_college_id']
+        isGraduate = item['isGraduate']
+        isSport = item['isSport']
+        isRecommendedStudent = item['isRecommendedStudent']
+        isNationalDefenceStudent = item['isNationalDefenceStudent']
+        isIndependentRecruitment = item['isIndependentRecruitment']
+        tags = item['tags']
+        bxType = item['bxType']
+        star = item['star']
+        vrUrl = item['vrUrl']
+        bannerUrl = item['bannerUrl']
+        webSite = item['admissionsWebSite']
+        admissionsWebSite = item['admissionsWebSite']
+        admissionsEmail = item['admissionsEmail']
+        address = item['address']
+        phone = item['phone']
+        postCode = item['postCode']
+        importClassic = item['importClassic']
+        department = item['department']
+        faculty = item['faculty']
+        addressCoordFromBaidu = item['addressCoordFromBaidu']
+        numberOfStudents = item['numberOfStudents']
+        numberOfBen = item['numberOfBen']
+        numberOfYan = item['numberOfYan']
+        numberOfBo = item['numberOfBo']
+        numberOfCJXZ = item['numberOfCJXZ']
+        numberOfYuan = item['numberOfYuan']
+        pointsOfBSH = item['pointsOfBSH']
+        countOfFollow = item['countOfFollow']
+        countOfFill = item['countOfFill']
+        countOfAP = item['countOfAP']
+        introduction = item['introduction']
+        keyMajors = item['keyMajors']
+        collegeDepartments = item['collegeDepartments']
+        numId = item['numId']
+        code = item['code']
+        logoId = item['logoId']
+        logoUrl = item['logoUrl']
+        provinceId = item['provinceId']
+        cityId = item['cityId']
+        provinceName = item['provinceName']
+        cityName = item['cityName']
+        rankOfCn = item['rankOfCn']
+        cnName = item['cnName']
+        enName = item['enName']
+        femaleRate = item['femaleRate']
+        maleRate = item['maleRate']
+        shortName = item['shortName']
+        nameUsedBefore = item['nameUsedBefore']
+        creation = item['creation']
+        educationId = item['educationId']
+        typeId = item['typeId']
+        level = item['level']
+        nature = item['nature']
+        classify = item['classify']
+        belong = item['belong']
+        belongFull = item['belongFull']
+        isArt = item['isArt']
+        isSingleRecruit = item['isSingleRecruit']
+        bxcc = item['bxcc']
+        is985 = item['is985']
+        is211 = item['is211']
+        isKey = item['isKey']
+        isProvincial = item['isProvincial']
+        isBTProvince = item['isBTProvince']
+        isDependent = item['isDependent']
+        isCivilianRun = item['isCivilianRun']
+        isGZDZ = item['isGZDZ']
+        hits = item['hits']
+        collegeRule = item['collegeRule']
+        majorRule = item['majorRule']
+        firstClass = item['firstClass']
+        year = item['year']
+        line = item['line']
+        plan = item['plan']
+        rankOfWorld = item['rankOfWorld']
+        rankSummary = item['rankSummary']
+        pointsOfShuo = item['pointsOfShuo']
+        pointsOfBo = item['pointsOfBo']
+        type = item['type']
+        education = item['education']
+        formatHits = item['formatHits']
+        summary = item['summary']
+        employmentRate = item['employmentRate']
+        keyMajorNum = item['keyMajorNum']
+        departmentNum = item['departmentNum']
+        keySubjectQTY = item['keySubjectQTY']
+
+        cursor.execute(sql, (
+            college_detail_id, yzy_college_id, isGraduate, isSport, isRecommendedStudent, isNationalDefenceStudent,
+            isIndependentRecruitment, tags, bxType, star, vrUrl, bannerUrl, webSite, admissionsWebSite,
+            admissionsEmail, address, phone, postCode, importClassic
+            , department, faculty, addressCoordFromBaidu, numberOfStudents, numberOfBen, numberOfYan,
+            numberOfBo, numberOfCJXZ, numberOfYuan,
+            pointsOfBSH, countOfFollow, countOfFill, countOfAP, introduction, keyMajors, collegeDepartments,
+            numId, code, logoId, logoUrl,
+            provinceId, cityId, provinceName, cityName, rankOfCn, cnName, enName, femaleRate, maleRate,
+            shortName, nameUsedBefore, creation,
+            educationId, typeId, level, nature, classify, belong, belongFull, isArt, isSingleRecruit, bxcc,
+            is985, is211, isKey, isProvincial,
+            isBTProvince, isDependent, isCivilianRun, isGZDZ, hits, collegeRule, majorRule, firstClass,
+            year, line, plan, rankOfWorld, rankSummary,
+            pointsOfShuo, pointsOfBo, type, education, formatHits, summary, employmentRate, keyMajorNum,
+            departmentNum, keySubjectQTY))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyCollegePipeline(object):
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO college_yzy (is_public,college_name,creation_time,school_type,belong_to,is_undergraduate,
+province,address,master_station_count,doctor_station_count,school_desc,college_id,college_level)
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        is_public = item['is_public']
+        college_name = item['college_name']
+        creation_time = item['creation_time']
+        school_type = item['school_type']
+        belong_to = item['belong_to']
+        is_undergraduate = item['is_undergraduate']
+        address = item['address']
+        master_station_count = item['master_station_count']
+        doctor_station_count = item['doctor_station_count']
+        school_desc = item['school_desc']
+        college_id = item['college_id']
+        college_level = item['college_level']
+        province = item['province']
+        cursor.execute(sql, (is_public, college_name, creation_time, school_type, belong_to, is_undergraduate,
+                             province, address, master_station_count, doctor_station_count, school_desc, college_id,
+                             college_level))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
 class NcdaPipeline(object):
 
     # 初始化函数
@@ -254,6 +484,141 @@ class NcdaPipeline(object):
         content = item['content']
         category = item['category']
         cursor.execute(sql, (author, title, public_date, content, category))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyCollegeEnrollCodePipline(object):
+
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO yzy_college_enroll_code (provinceId,provinceName,uCodeNum,admissCode,collegeId,collegeName
+,sort,isOld,codeChangeYear,str_id)
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        provinceId = item['provinceId']
+        provinceName = item['provinceName']
+        uCodeNum = item['uCodeNum']
+        admissCode = item['admissCode']
+        collegeId = item['collegeId']
+        collegeName = item['collegeName']
+        sort = item['sort']
+        isOld = item['isOld']
+        codeChangeYear = item['codeChangeYear']
+        str_id = item['str_id']
+        cursor.execute(sql, (provinceId, provinceName, uCodeNum, admissCode, collegeId, collegeName
+                             , sort, isOld, codeChangeYear, str_id))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyCollegeScorelinePipline(object):
+
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO yzy_college_scoreline (year,course,batch,batchName,uCode,chooseLevel
+,lineDiff,minScore,avgScore,maxScore,lowSort,maxSort,enterNum,countOfZJZY,prvControlLines,province_id)
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        year = item['year']
+        course = item['course']
+        batch = item['batch']
+        batchName = item['batchName']
+        uCode = item['uCode']
+        chooseLevel = item['chooseLevel']
+        lineDiff = item['lineDiff']
+        minScore = item['minScore']
+        avgScore = item['avgScore']
+        maxScore = item['maxScore']
+        lowSort = item['lowSort']
+        maxSort = item['maxSort']
+        enterNum = item['enterNum']
+        countOfZJZY = item['countOfZJZY']
+        prvControlLines = item['prvControlLines']
+        province_id = item['province_id']
+        cursor.execute(sql, (year, course, batch, batchName, uCode, chooseLevel
+                             , lineDiff, minScore, avgScore, maxScore, lowSort, maxSort, enterNum, countOfZJZY,
+                             prvControlLines, province_id))
         # 错误函数
 
     def handle_error(self, failure, item, spider):
