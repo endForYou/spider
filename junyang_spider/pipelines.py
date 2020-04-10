@@ -236,6 +236,8 @@ class YzyCollegeDetailPipline(object):
         # 把要执行的sql放入连接池
         query = self.db_pool.runInteraction(self.insert_into, item)
         # 如果sql执行发送错误,自动回调addErrBack()函数
+        # print("11111111111",item)
+        # print("111111111111111111111111111111111111111111111111111111111111111111111111")
         query.addErrback(self.handle_error, item, spider)
 
         # 返回Item
@@ -244,7 +246,7 @@ class YzyCollegeDetailPipline(object):
     # 处理sql函数
     def insert_into(self, cursor, item):
         # 创建sql语句
-        sql = '''INSERT INTO yzy_college (id,yzy_college_id,isGraduate,isSport,isRecommendedStudent,isNationalDefenceStudent,
+        sql = '''INSERT INTO yzy_college (did,yzy_college_id,isGraduate,isSport,isRecommendedStudent,isNationalDefenceStudent,
     isIndependentRecruitment,tags,bxType,star,vrUrl,bannerUrl,webSite,admissionsWebSite,admissionsEmail,address,phone,postCode,importClassic
     ,department,faculty,addressCoordFromBaidu,numberOfStudents,numberOfBen,numberOfYan,numberOfBo,numberOfCJXZ,numberOfYuan,
    pointsOfBSH,countOfFollow, countOfFill,countOfAP,introduction,keyMajors,collegeDepartments,numId,code,logoId,logoUrl,
@@ -345,7 +347,7 @@ class YzyCollegeDetailPipline(object):
         keyMajorNum = item['keyMajorNum']
         departmentNum = item['departmentNum']
         keySubjectQTY = item['keySubjectQTY']
-
+        # print("111111111111111111111111111111111111111111111111111111111111111111111111")
         cursor.execute(sql, (
             college_detail_id, yzy_college_id, isGraduate, isSport, isRecommendedStudent, isNationalDefenceStudent,
             isIndependentRecruitment, tags, bxType, star, vrUrl, bannerUrl, webSite, admissionsWebSite,
@@ -362,6 +364,7 @@ class YzyCollegeDetailPipline(object):
             year, line, plan, rankOfWorld, rankSummary,
             pointsOfShuo, pointsOfBo, type, education, formatHits, summary, employmentRate, keyMajorNum,
             departmentNum, keySubjectQTY))
+
         # 错误函数
 
     def handle_error(self, failure, item, spider):
@@ -620,6 +623,210 @@ class YzyCollegeScorelinePipline(object):
         cursor.execute(sql, (year, course, batch, batchName, uCode, chooseLevel
                              , lineDiff, minScore, avgScore, maxScore, lowSort, maxSort, enterNum, countOfZJZY,
                              prvControlLines, province_id))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyMajorScorelinePipline(object):
+
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO yzy_major_scoreline (year,course,batch,batchName,uCode,chooseLevel
+,lineDiff,minScore,avgScore,maxScore,lowSort,maxSort,enterNum,countOfZJZY,province_id,majorCode,professionName,professionCode
+,remarks)
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        year = item['year']
+        course = item['course']
+        batch = item['batch']
+        batchName = item['batchName']
+        uCode = item['uCode']
+        chooseLevel = item['chooseLevel']
+        lineDiff = item['lineDiff']
+        minScore = item['minScore']
+        avgScore = item['avgScore']
+        maxScore = item['maxScore']
+        lowSort = item['lowSort']
+        maxSort = item['maxSort']
+        enterNum = item['enterNum']
+        countOfZJZY = item['countOfZJZY']
+        majorCode = item['majorCode']
+        professionName = item['professionName']
+        professionCode = item['professionCode']
+        remarks = item['remarks']
+        province_id = item['province_id']
+        cursor.execute(sql, (year, course, batch, batchName, uCode, chooseLevel
+                             , lineDiff, minScore, avgScore, maxScore, lowSort, maxSort, enterNum, countOfZJZY,
+                             province_id, majorCode, professionName, professionCode
+                             , remarks))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyMajorPipline(object):
+
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO yzy_major (code,name,grade,category,category_code,subcategory
+,subcategory_code)
+ VALUES (%s,%s,%s,%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        code = item['major_code']
+        name = item['major_name']
+        grade = item['grade']
+        category = item['category_name']
+        category_code = item['category_code']
+        subcategory = item['subcategory_name']
+        subcategory_code = item['subcategory_code']
+
+        cursor.execute(sql, (code, name, grade, category, category_code, subcategory
+                             , subcategory_code))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyEnrollPlanPipline(object):
+
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO yzy_enroll_plan (year,courseType,batch,batchName,uCode,majorCode
+,professionName,professionCode,planNum,cost,learnYear,province_id)
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        year = item['year']
+        courseType = item['courseType']
+        batch = item['batch']
+        batchName = item['batchName']
+        uCode = item['uCode']
+        majorCode = item['majorCode']
+        professionName = item['professionName']
+        professionCode = item['professionCode']
+        planNum = item['planNum']
+        cost = item['cost']
+        learnYear = item['learnYear']
+        province_id = item['province_id']
+        cursor.execute(sql, (year, courseType, batch, batchName, uCode, majorCode
+                             , professionName, professionCode, planNum, cost, learnYear, province_id))
         # 错误函数
 
     def handle_error(self, failure, item, spider):

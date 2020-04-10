@@ -33,7 +33,7 @@ class YzyCollegeScorelineSpider(scrapy.Spider):
             charset='utf8',
             use_unicode=True)
         cursor = connect.cursor(pymysql.cursors.DictCursor)
-        sql = "select provinceId,uCodeNum from yzy_college_enroll_code"
+        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId>=859"
         cursor.execute(sql)
         result = cursor.fetchall()
         cursor.close()

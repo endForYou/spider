@@ -425,3 +425,50 @@ class YzyCollegeScorelineItem(scrapy.Item):
     countOfZJZY = scrapy.Field()
     prvControlLines = scrapy.Field()
     province_id = scrapy.Field()
+
+
+class YzyMajorScoreLineItem(scrapy.Item):
+    year = scrapy.Field()
+    course = scrapy.Field()
+    batch = scrapy.Field()
+    batchName = scrapy.Field()
+    uCode = scrapy.Field()
+    chooseLevel = scrapy.Field()
+    lineDiff = scrapy.Field()
+    majorCode = scrapy.Field()
+    professionName = scrapy.Field()
+    professionCode = scrapy.Field()
+    remarks = scrapy.Field()
+    minScore = scrapy.Field()
+    avgScore = scrapy.Field()
+    maxScore = scrapy.Field()
+    lowSort = scrapy.Field()
+    maxSort = scrapy.Field()
+    enterNum = scrapy.Field()
+    countOfZJZY = scrapy.Field()
+    province_id = scrapy.Field()
+
+
+class YzyMajorItem(scrapy.Item):
+    category_name = scrapy.Field()
+    category_code = scrapy.Field()
+    subcategory_name = scrapy.Field()
+    subcategory_code = scrapy.Field()
+    major_name = scrapy.Field()
+    major_code = scrapy.Field()
+    grade = scrapy.Field()
+
+
+class YzyEnrollPlanItem(scrapy.Item):
+    year = scrapy.Field()
+    courseType = scrapy.Field()
+    batch = scrapy.Field()
+    batchName = scrapy.Field()
+    uCode = scrapy.Field()
+    majorCode = scrapy.Field()
+    professionName = scrapy.Field()
+    professionCode = scrapy.Field()
+    planNum = scrapy.Field()
+    cost = scrapy.Field()
+    learnYear = scrapy.Field()
+    province_id = scrapy.Field()

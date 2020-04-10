@@ -5,7 +5,7 @@
 @time 2020/3/4 17:56
 """
 import scrapy
-from junyang_spider.items import YzyCollegeScorelineItem
+from junyang_spider.items import YzyMajorScoreLineItem
 import pymysql
 from junyang_spider import settings
 import json
@@ -32,7 +32,7 @@ class YzyMajorScoreSpider(scrapy.Spider):
             charset='utf8',
             use_unicode=True)
         cursor = connect.cursor(pymysql.cursors.DictCursor)
-        sql = "select provinceId,uCodeNum from yzy_college_enroll_code"
+        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId>858"
         cursor.execute(sql)
         result = cursor.fetchall()
         cursor.close()
@@ -43,21 +43,25 @@ class YzyMajorScoreSpider(scrapy.Spider):
         college_enroll_codes = self.get_colleges_enroll_code_from_db()
         # print(colleges)
         for college_enroll_code in college_enroll_codes:
-            province_id = college_enroll_code['ProvinceId']
+            province_id = college_enroll_code['provinceId']
             ucode = college_enroll_code['uCodeNum']
             url = self.base_url + "/Data/ScoreLines/Fractions/Professions/Query"
-            data = {
-                'uCode': "43_838_0_0", 'batch': 0, 'courseType': 0, 'yearFrom': 2018, 'yearTo': 2018
-            }
-            encrypted_hex = execute_js.encrypt_data(data)
-            data = {
-                'data': encrypted_hex
-            }
-            # print(data, college_id, province_id)
-            data = {
-                'province_id': province_id
-            }
-            yield scrapy.FormRequest(url, meta=data, method="POST", formdata=data)
+            course_types = [0, 1]
+            years = [2016, 2017, 2018, 2019]
+            for course in course_types:
+                for year in years:
+                    data = {
+                        'uCode': ucode, 'batch': 0, 'courseType': course, 'yearFrom': year, 'yearTo': year
+                    }
+                    encrypted_hex = execute_js.encrypt_data(data)
+                    data = {
+                        'data': encrypted_hex
+                    }
+                    # print(data, college_id, province_id)
+                    meta_data = {
+                        'province_id': province_id
+                    }
+                    yield scrapy.FormRequest(url, meta=meta_data, method="POST", formdata=data)
 
     def parse(self, response):
         # 学校列表
@@ -66,7 +70,7 @@ class YzyMajorScoreSpider(scrapy.Spider):
         infos = json.loads(response.text)['result']
         for info in infos:
             # meta = response.meta
-            item = YzyCollegeScorelineItem()
+            item = YzyMajorScoreLineItem()
             item['year'] = info['year']
             # 只要2016及以后的数据
             if item['year'] < 2016:
@@ -84,17 +88,22 @@ class YzyMajorScoreSpider(scrapy.Spider):
             if lowSort:
                 lowSort = yzy.show_number(lowSort)
             maxSort = info['maxSort']
-            if maxSort:
+            if maxSort and isinstance(maxSort, str):
+                # print(maxSort)
                 maxSort = yzy.show_number(maxSort)
             enterNum = info['enterNum']
             if enterNum:
                 enterNum = yzy.show_number(enterNum)
-            item['course'] = info['course']
+            item['course'] = info['courseType']
             item['batch'] = info['batch']
             item['batchName'] = info['batchName']
             item['uCode'] = info['uCode']
             item['chooseLevel'] = info['chooseLevel']
             item['lineDiff'] = info['lineDiff']
+            item['majorCode'] = info['majorCode']
+            item['professionName'] = yzy.show_str(info['professionName']) if info['professionName'] else None
+            item['professionCode'] = yzy.show_str(info['professionCode']) if info['professionCode'] else None
+            item['remarks'] = info['remarks']
             item['minScore'] = minScore
             item['avgScore'] = avgScore
             item['maxScore'] = maxScore
@@ -102,6 +111,6 @@ class YzyMajorScoreSpider(scrapy.Spider):
             item['maxSort'] = maxSort
             item['enterNum'] = enterNum
             item['countOfZJZY'] = info['countOfZJZY']
-            item['prvControlLines'] = info['prvControlLines']
             item['province_id'] = province_id
+            item['year'] = info['year']
             yield item

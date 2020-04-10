@@ -66,7 +66,7 @@ def crawl_paper_list():
         "4": "排行榜",
         "2": "志愿填报",
     }
-    token = "15045901-2-96a17c3296219b45"
+    token = "15045901-2-c5aba5c766d7f7b5"
     insert_into_sql = "insert into career_planning_article_new(category,title,upload_time,html_content,cover,overview) values (%s,%s,%s,%s,%s,%s)"
     for k, v in type_dic.items():
         if k == "2":
@@ -92,6 +92,10 @@ def crawl_paper_list():
                     soup = bs(response.text, "lxml")
                     # print(response.text)
                     html_content = str(soup.select_one("section").extract())
+                    # 过滤带关键字的文章
+
+                    if html_content.find("E网通") != -1 or html_content.find("小E") != -1:
+                        continue
                     # print(html_content)
                     cursor.execute(insert_into_sql, (v, title, upload_time, html_content, image_path, overview))
 

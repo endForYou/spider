@@ -49,7 +49,7 @@ cursor = db.cursor(pymysql.cursors.DictCursor)
 
 def crawl_paper_list():
     headers = {
-        'Cookie': "big_data_cookie_id=f0ac135c-dfee-97e7-5f2e-695074e1b5a0%7C1566979046182; Hm_mstid_=798863147595853; _ga=GA1.2.2147104404.1566979047; UserID=15045901; Hm_lvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1571106514,1571638418,1572593277; Hm_lvt_5261308991055a39373a5ccf8edd3695=1571106514,1571638418,1572593277; _gid=GA1.2.671273945.1573451862; ASP.NET_SessionId=e223oyvcd0uklr1q2utura1t; user=tk=15045901-1-bf33fbec39cd1a0e&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uSHxbNR88L3AbuMOeE3SHGJEZ7bzkjdADvG2Zi8TKVIvL%0AJ5txrZj9f4E6f2HVXC5SwrR4+tfa31++aCRUajQauc2azsvmHXky9DbsslEVHUptxoC7EmCUuw==; ewt_user=tk=15045901-1-bf33fbec39cd1a0e&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uSHxbNR88L3AbuMOeE3SHGJEZ7bzkjdADvG2Zi8TKVIvL%0AJ5txrZj9f4E6f2HVXC5SwrR4+tfa31++aCRUajQauc2azsvmHXky9DbsslEVHUptxoC7EmCUuw==; token=15045901-1-bf33fbec39cd1a0e; Hm_lvt_=1573096946,1573451862,1573455714,1573463053; Hm_lpvt_=1573463079; Hm_lpvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1573463079; Hm_lpvt_5261308991055a39373a5ccf8edd3695=1573463079",
+        'Cookie': "big_data_cookie_id=f0ac135c-dfee-97e7-5f2e-695074e1b5a0%7C1566979046182; Hm_mstid_=798863147595853; _ga=GA1.2.2147104404.1566979047; Hm_lvt_5261308991055a39373a5ccf8edd3695=1571638418,1572593277,1573727355; Hm_lvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1585121988; _gid=GA1.2.2031544076.1585121989; UserID=15045901; user=tk=15045901-1-2a3b6ffe38dba701&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uSHxbNR88L3AbuMOeE3SHGJEZ7bzkjdADrRhDRRHba8Es%0AnF+TguV5PP1QBwPQgMhroZbjTUMtJQ/5jaiAohGJYCXHqme7s1JSeAOh0l/FufG4lGc2c4pYDg==; ewt_user=tk=15045901-1-2a3b6ffe38dba701&info=FY6PmGnI2LPN+XQfS1m0Kt1V+mq4ym/uSHxbNR88L3AbuMOeE3SHGJEZ7bzkjdADrRhDRRHba8Es%0AnF+TguV5PP1QBwPQgMhroZbjTUMtJQ/5jaiAohGJYCXHqme7s1JSeAOh0l/FufG4lGc2c4pYDg==; token=15045901-1-2a3b6ffe38dba701; Hm_lvt_=1585121988,1585121994,1585122014; Hm_lpvt_=1585122523; Hm_lpvt_9f9b5bffee4cbc2aeda3d2bb3470e2f6=1585122524",
         'User-Agent': "PostmanRuntime/7.18.0",
         'Accept': "*/*",
         'Cache-Control': "no-cache",
@@ -60,46 +60,50 @@ def crawl_paper_list():
     }
     url = base_url + "/ApplyNews/NewsList"
     type_dic = {
-        # "13": "生涯认知",
-        # "7": "专业与职业",
-        # "6": "生涯动态",
-        # "4": "排行榜",
+        "13": "生涯认知",
+        "7": "专业与职业",
+        "6": "生涯动态",
+        "4": "排行榜",
         "2": "志愿填报",
     }
     insert_into_sql = "insert into career_planning_article(categorys,title,upload_time,html_content,url) values (%s,%s,%s,%s,%s)"
     for k, v in type_dic.items():
+        if k == "2":
+            childNum = 3
+        else:
+            childNum = 0
+        querystring = {"typeId": k, "childNum": childNum}
+        # response = requests.request("GET", url, headers=headers, params=querystring)
+        # if response.status_code == 200:
+        #     soup = bs(response.text, "lxml")
+        #     text = soup.select_one(".page div:nth-of-type(1)").get_text().strip()
+        #     # print(text)
+        #     #page_count = int(re.findall("1/(.*)页", text)[0].split("页")[0])
+        #     print(page_count)
+        page_count = 4
+        for page in range(1, page_count + 1):
+            querystring = {"typeId": k, "childNum": childNum, "page": page}
+            response = requests.request("GET", url, headers=headers, params=querystring)
+            if response.status_code == 200:
+                soup = bs(response.text, "lxml")
+                items = soup.select("div.mnsTitle")
+                for item in items:
+                    href = item.select_one("h1 a").attrs['href']
+                    title = item.select_one("h1 a").get_text()
+                    upload_time = item.select_one("span.mnsS").get_text()
+                    detail_url = base_url + href
+                    response = requests.request("GET", detail_url, headers=headers)
+                    if response.status_code == 200:
+                        soup = bs(response.text, "lxml")
+                        # print(response.text)
+                        html_content = str(soup.select_one("section").extract())
 
-        querystring = {"typeId": k, "childNum": "3"}
-        response = requests.request("GET", url, headers=headers, params=querystring)
-        if response.status_code == 200:
-            soup = bs(response.text, "lxml")
-            text = soup.select_one(".page div:nth-of-type(1)").get_text().strip()
-            # print(text)
-            page_count = int(re.findall("1/(.*)页", text)[0].split("页")[0])
-            print(page_count)
-            for page in range(1, page_count + 1):
-                querystring = {"typeId": k, "childNum": "3", "page": page}
-                response = requests.request("GET", url, headers=headers, params=querystring)
-                if response.status_code == 200:
-                    soup = bs(response.text, "lxml")
-                    items = soup.select("div.mnsTitle")
-                    for item in items:
-                        href = item.select_one("h1 a").attrs['href']
-                        title = item.select_one("h1 a").get_text()
-                        upload_time = item.select_one("span.mnsS").get_text()
-                        detail_url = base_url + href
-                        response = requests.request("GET", detail_url, headers=headers)
-                        if response.status_code == 200:
-                            soup = bs(response.text, "lxml")
-                            # print(response.text)
-                            html_content = str(soup.select_one("section").extract())
+                        # print(v, title, upload_time, detail_url)
+                        # print(html_content)
+                        cursor.execute(insert_into_sql, (v, title, upload_time, html_content, detail_url))
 
-                            #print(v, title, upload_time, detail_url)
-                            #print(html_content)
-                            cursor.execute(insert_into_sql, (v, title, upload_time, html_content, detail_url))
-
-                else:
-                    print(url)
+            else:
+                print(url)
             # for item in items:
             #     # href = item.select_one("a").attrs['href']
             #     name = item.select_one("a").get_text().strip()
@@ -107,8 +111,6 @@ def crawl_paper_list():
             # detail_url = base_url + href
             # print(detail_url)
             # crawl_paper_detail(detail_url, headers)
-        else:
-            print(url)
 
 
 #

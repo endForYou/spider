@@ -61,7 +61,10 @@ class YzyCollegeSpider(scrapy.Spider):
             "p.pointsOfShuo::text") else None
         item['doctor_station_count'] = response.css("p.pointsOfBo::text").extract_first() if response.css(
             "p.pointsOfBo::text") else None
-        url = response.css(".text-right a::attr('href')").extract_first()
+        if not response.css("p a::attr('href')"):
+            url = response.css(".text-right a::attr('href')").extract_first()
+        else:
+            url = response.css("p a::attr('href')").extract_first()
         url = self.base_url + url
         yield scrapy.Request(url, meta={'item': item}, callback=self.parse_college_desc, dont_filter=True)
 

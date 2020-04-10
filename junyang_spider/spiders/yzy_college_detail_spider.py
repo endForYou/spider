@@ -10,15 +10,15 @@ import pymysql
 from junyang_spider import settings
 import json
 
+
 class YzyCollegeSpider(scrapy.Spider):
     name = "yzy_college_detail"
     allowed_domains = ["youzy.cn"]
     base_url = "https://ia-pv4y.youzy.cn"
-    start_urls = [
-        "https://www.youzy.cn/tzy/search/colleges/collegeList",
-        # "http://www.gaokaoq.com/major.html?level=2"
+    custom_settings = {
+        'ITEM_PIPELINES': {'junyang_spider.pipelines.YzyCollegeDetailPipline': 100},
 
-    ]
+    }
 
     @classmethod
     def get_colleges_from_db(cls):
@@ -50,6 +50,7 @@ class YzyCollegeSpider(scrapy.Spider):
         meta = response.meta
         item = YzyCollegeDetailItem()
         item['college_detail_id'] = infos['id']
+        print(item['college_detail_id'])
         item['yzy_college_id'] = meta['yzy_college_id']
         item['isGraduate'] = infos['isGraduate']
         item['isSport'] = infos['isSport']
