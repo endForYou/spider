@@ -743,24 +743,47 @@ class YzyMajorPipline(object):
         # 返回Item
         return item
 
-    # 处理sql函数
+        # 处理sql函数
     def insert_into(self, cursor, item):
-        # 创建sql语句
-        sql = '''INSERT INTO yzy_major (code,name,grade,category,category_code,subcategory
-,subcategory_code)
- VALUES (%s,%s,%s,%s,%s,%s,%s)
-'''
-        # 执行sql语句
-        code = item['major_code']
-        name = item['major_name']
-        grade = item['grade']
-        category = item['category_name']
-        category_code = item['category_code']
-        subcategory = item['subcategory_name']
-        subcategory_code = item['subcategory_code']
+            # 创建sql语句
+            sql = '''INSERT INTO yzy_major (code,name,grade,category,category_code,subcategory
+    ,subcategory_code)
+     VALUES (%s,%s,%s,%s,%s,%s,%s)
+    '''
+            # 执行sql语句
+            code = item['major_code']
+            name = item['major_name']
+            grade = item['grade']
+            category = item['category_name']
+            category_code = item['category_code']
+            subcategory = item['subcategory_name']
+            subcategory_code = item['subcategory_code']
 
-        cursor.execute(sql, (code, name, grade, category, category_code, subcategory
-                             , subcategory_code))
+            cursor.execute(sql, (code, name, grade, category, category_code, subcategory
+                                 , subcategory_code))
+            # 错误函数
+#
+#     def insert_into(self, cursor, item):
+#         # 创建sql语句
+#         sql = '''INSERT INTO yzy_major_details (courses,description,employment,inherit_secondary_vocational,inherit_undergraduate
+# ,job_qualification_certificate,knowledge,major_name,major_code,grade,schooling_time,degree)
+#      VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+#     '''
+#         # 执行sql语句
+#         code = item['major_code']
+#         name = item['major_name']
+#         grade = item['grade']
+#         courses = item['courses']
+#         description = item['description']
+#         employment = item['employment']
+#         inherit_secondary_vocational = item['inherit_secondary_vocational']
+#         inherit_undergraduate = item['inherit_undergraduate']
+#         job_qualification_certificate = item['job_qualification_certificate']
+#         knowledge = item['knowledge']
+#         schooling_time = item['schooling_time']
+#         degree = item['degree']
+#         cursor.execute(sql, (courses, description, employment, inherit_secondary_vocational, inherit_undergraduate
+#                              , job_qualification_certificate, knowledge, name, code, grade, schooling_time, degree))
         # 错误函数
 
     def handle_error(self, failure, item, spider):
@@ -827,6 +850,119 @@ class YzyEnrollPlanPipline(object):
         province_id = item['province_id']
         cursor.execute(sql, (year, courseType, batch, batchName, uCode, majorCode
                              , professionName, professionCode, planNum, cost, learnYear, province_id))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyEnrollGuidePipline(object):
+
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''INSERT INTO enroll_guide (content,publish_date,title,college_id)
+ VALUES (%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        content = item['content']
+        publish_date = item['publish_date']
+        title = item['title']
+        college_id = item['college_id']
+        cursor.execute(sql, (content, publish_date, title, college_id))
+        # 错误函数
+
+    def handle_error(self, failure, item, spider):
+        print(failure)
+
+
+class YzyCollegeMajorPipline(object):
+
+    # 初始化函数
+    def __init__(self, db_pool):
+        self.db_pool = db_pool
+
+    # 从settings配置文件中读取参数
+    @classmethod
+    def from_settings(cls, settings):
+        # 用一个db_params接收连接数据库的参数
+        db_params = dict(
+            host=settings['MYSQL_HOST'],
+            user=settings['MYSQL_USER'],
+            password=settings['MYSQL_PASSWD'],
+            port=settings['MYSQL_PORT'],
+            database=settings['MYSQL_DBNAME'],
+            charset=settings['MYSQL_CHARSET'],
+            use_unicode=True,
+            # 设置游标类型
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # 创建连接池
+
+        db_pool = adbapi.ConnectionPool('pymysql', **db_params)
+
+        # 返回一个pipeline对象
+        return cls(db_pool)
+
+    # 处理item函数
+    def process_item(self, item, spider):
+        # 把要执行的sql放入连接池
+        query = self.db_pool.runInteraction(self.insert_into, item)
+        # 如果sql执行发送错误,自动回调addErrBack()函数
+        query.addErrback(self.handle_error, item, spider)
+
+        # 返回Item
+        return item
+
+    # 处理sql函数
+    def insert_into(self, cursor, item):
+        # 创建sql语句
+        sql = '''insert into yzy_college_major(college_id,college_name,major_name,grade,yzy_college_id)
+ values (%s,%s,%s,%s,%s)
+'''
+        # 执行sql语句
+        college_name = item['college_name']
+        major_name = item['major_name']
+        grade = item['grade']
+        college_id = item['college_id']
+        yzy_college_id = item['yzy_college_id']
+        cursor.execute(sql, (college_id, college_name, major_name, grade, yzy_college_id))
         # 错误函数
 
     def handle_error(self, failure, item, spider):

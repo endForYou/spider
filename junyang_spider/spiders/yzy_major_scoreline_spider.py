@@ -32,7 +32,8 @@ class YzyMajorScoreSpider(scrapy.Spider):
             charset='utf8',
             use_unicode=True)
         cursor = connect.cursor(pymysql.cursors.DictCursor)
-        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId>858"
+        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId=851"
+        # sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId in (select ProvinceId from yzy_province where Used=1)"
         cursor.execute(sql)
         result = cursor.fetchall()
         cursor.close()
@@ -47,11 +48,13 @@ class YzyMajorScoreSpider(scrapy.Spider):
             ucode = college_enroll_code['uCodeNum']
             url = self.base_url + "/Data/ScoreLines/Fractions/Professions/Query"
             course_types = [0, 1]
-            years = [2016, 2017, 2018, 2019]
+            years = [2019, ]
+            # years = [2016, 2017, 2018, 2019]
+            year_from = 2016
             for course in course_types:
                 for year in years:
                     data = {
-                        'uCode': ucode, 'batch': 0, 'courseType': course, 'yearFrom': year, 'yearTo': year
+                        'uCode': ucode, 'batch': 0, 'courseType': course, 'yearFrom': year_from, 'yearTo': year
                     }
                     encrypted_hex = execute_js.encrypt_data(data)
                     data = {

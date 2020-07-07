@@ -459,6 +459,21 @@ class YzyMajorItem(scrapy.Item):
     grade = scrapy.Field()
 
 
+class YzyMajorDetailItem(scrapy.Item):
+    major_name = scrapy.Field()
+    major_code = scrapy.Field()
+    grade = scrapy.Field()
+    courses = scrapy.Field()
+    description = scrapy.Field()
+    employment = scrapy.Field()
+    inherit_secondary_vocational = scrapy.Field()
+    inherit_undergraduate = scrapy.Field()
+    job_qualification_certificate = scrapy.Field()
+    knowledge = scrapy.Field()
+    schooling_time = scrapy.Field()
+    degree = scrapy.Field()
+
+
 class YzyEnrollPlanItem(scrapy.Item):
     year = scrapy.Field()
     courseType = scrapy.Field()
@@ -472,3 +487,18 @@ class YzyEnrollPlanItem(scrapy.Item):
     cost = scrapy.Field()
     learnYear = scrapy.Field()
     province_id = scrapy.Field()
+
+
+class YzyEnrollGuideItem(scrapy.Item):
+    content = scrapy.Field()
+    publish_date = scrapy.Field()
+    title = scrapy.Field()
+    college_id = scrapy.Field()
+
+
+class YzyCollegeMajorItem(scrapy.Item):
+    college_id = scrapy.Field()
+    college_name = scrapy.Field()
+    major_name = scrapy.Field()
+    yzy_college_id = scrapy.Field()
+    grade = scrapy.Field()

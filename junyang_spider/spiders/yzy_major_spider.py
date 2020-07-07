@@ -6,6 +6,9 @@
 """
 import scrapy
 from junyang_spider.items import YzyMajorItem
+from junyang_spider.items import YzyMajorDetailItem
+import pymysql
+from junyang_spider import settings
 
 
 class YzyMajorSpider(scrapy.Spider):
@@ -22,11 +25,36 @@ class YzyMajorSpider(scrapy.Spider):
 
     }
 
+    @classmethod
+    def get_majors_from_db(cls):
+        connect = pymysql.connect(
+            host=settings.MYSQL_HOST,
+            port=settings.MYSQL_PORT,
+            db=settings.MYSQL_DBNAME,
+            user=settings.MYSQL_USER,
+            passwd=settings.MYSQL_PASSWD,
+            charset='utf8',
+            use_unicode=True)
+        cursor = connect.cursor(pymysql.cursors.DictCursor)
+        sql = "select * from yzy_major"
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        return result
+
     # def start_requests(self):
-    #     for page in range(1, 146):
-    #         url = self.base_url + "/tzy/search/colleges/collegeList?page=" + str(page)
-    #
-    #         yield scrapy.Request(url, meta={"sid": page}, method="GET", dont_filter=True)
+    #     majors = self.get_majors_from_db()
+    #     # print(colleges)
+    #     for major in majors:
+    #         code = major['code']
+    #         url = self.base_url + "/tzy/search/majors/smallMajor?code=%s" % code
+    #         name = major['name']
+    #         grade = major['grade']
+    #         data = {
+    #             "name": name,
+    #             "grade": grade,
+    #             "code": code
+    #         }
+    #         yield scrapy.Request(url, meta=data, method="get", callback=self.parse_detail)
 
     def parse(self, response):
         # 学校列表
@@ -50,7 +78,7 @@ class YzyMajorSpider(scrapy.Spider):
                     item = YzyMajorItem()
                     major_name = major.css("::text").extract_first()
                     major_code = major.css("::attr('href')").extract_first().split("code=")[1]
-                    item['grade']=0
+                    item['grade'] = 0
                     item['category_name'] = category_name
                     item['category_code'] = category_code
                     item['subcategory_name'] = sub_category_name
@@ -101,27 +129,37 @@ class YzyMajorSpider(scrapy.Spider):
         #
         # yield scrapy.Request(url, meta={'item': item}, callback=self.parse_detail, dont_filter=True)
 
-    # def parse_detail(self, response):
-    #     item = response.meta['item']
-    #     print(item)
-    #     item['creation_time'] = response.css("p.creation::text").extract_first()
-    #     item['is_public'] = response.css("p.type::text").extract_first()
-    #     item['school_type'] = response.css("p.classify::text").extract_first()
-    #     item['belong_to'] = response.css("p.belong::text").extract_first()
-    #     item['is_undergraduate'] = response.css("p.education::text").extract_first()
-    #     item['address'] = response.css("p.cityName::text").extract_first().strip()
-    #     item['master_station_count'] = response.css("p.pointsOfShuo::text").extract_first() if response.css(
-    #         "p.pointsOfShuo::text") else None
-    #     item['doctor_station_count'] = response.css("p.pointsOfBo::text").extract_first() if response.css(
-    #         "p.pointsOfBo::text") else None
-    #     if not response.css("p a::attr('href')"):
-    #         url = response.css(".text-right a::attr('href')").extract_first()
-    #     else:
-    #         url = response.css("p a::attr('href')").extract_first()
-    #     url = self.base_url + url
-    #     yield scrapy.Request(url, meta={'item': item}, callback=self.parse_college_desc, dont_filter=True)
-    #
-    # def parse_college_desc(self, response):
-    #     item = response.meta['item']
-    #     item['school_desc'] = response.css("#introduction::text").extract_first()
-    #     yield item
+    def parse_detail(self, response):
+        name = response.meta['name']
+        grade = response.meta['grade']
+        code = response.meta['code']
+        item = YzyMajorDetailItem()
+        item['grade'] = grade
+        item['major_name'] = name
+        item['major_code'] = code
+        item['courses'] = response.css("#majorCourse::text").extract_first()
+        item['description'] = response.css("#majorObjective::text").extract_first()
+        item['employment'] = response.css("#employmentProspects::text").extract_first()
+        item['knowledge'] = response.css("#majorLoreAndAbility::text").extract_first()
+        item['inherit_secondary_vocational'] = None
+        item['schooling_time'] = response.css(
+            "div.col-xs-4:nth-of-type(2) p.major-overview-textMain::text").extract_first()
+        item['degree'] = response.css("#majorLoreAndAbility::text").extract_first()
+        # 专科
+        if grade:
+            item['job_qualification_certificate'] = response.css(
+                ".introduce div:nth-of-type(4) p:nth-of-type(2)::text").extract_first()
+
+            item['inherit_undergraduate'] = response.css("#progressions::text").extract_first()
+            item['degree'] = None
+        # 本科
+        else:
+            item['job_qualification_certificate'] = None
+            item['inherit_undergraduate'] = None
+            item['degree'] = response.css("div.col-xs-4:nth-of-type(3) p.major-overview-textMain::text").extract_first()
+        yield item
+
+    def parse_college_desc(self, response):
+        item = response.meta['item']
+        item['school_desc'] = response.css("#introduction::text").extract_first()
+        yield item

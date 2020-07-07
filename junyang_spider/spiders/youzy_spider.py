@@ -8,7 +8,7 @@ class Youzy_Spider(scrapy.Spider):
     name = "youzy"
     allowed_domains = ["youzy.cn"]
     start_urls = [
-        "https://www.youzy.cn/college/search?page=121",
+        "https://www.youzy.cn/college/search?page=1",
         # "https://www.youzy.cn/college/848/home.html",
 
     ]

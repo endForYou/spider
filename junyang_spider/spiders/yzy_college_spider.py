@@ -23,7 +23,7 @@ class YzyCollegeSpider(scrapy.Spider):
     }
 
     def start_requests(self):
-        for page in range(1, 146):
+        for page in range(1, 143):
             url = self.base_url + "/tzy/search/colleges/collegeList?page=" + str(page)
 
             yield scrapy.Request(url, meta={"sid": page}, method="GET", dont_filter=True)

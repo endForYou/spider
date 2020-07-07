@@ -32,7 +32,7 @@ class YzyEnrollPlanSpider(scrapy.Spider):
             charset='utf8',
             use_unicode=True)
         cursor = connect.cursor(pymysql.cursors.DictCursor)
-        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId>=860"
+        sql = "select provinceId,uCodeNum from yzy_college_enroll_code "
         #sql = "select provinceId,uCodeNum from yzy_college_enroll_code where uCodeNum='43_1772_0_0'"
         cursor.execute(sql)
         result = cursor.fetchall()

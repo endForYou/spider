@@ -33,7 +33,8 @@ class YzyCollegeScorelineSpider(scrapy.Spider):
             charset='utf8',
             use_unicode=True)
         cursor = connect.cursor(pymysql.cursors.DictCursor)
-        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId>=859"
+        # sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId in (select ProvinceId from yzy_province where Used=1)"
+        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId=850"
         cursor.execute(sql)
         result = cursor.fetchall()
         cursor.close()
@@ -51,7 +52,7 @@ class YzyCollegeScorelineSpider(scrapy.Spider):
                 'provinceNumId': str(province_id),
                 'ucode': str(ucode)
             }
-            #print(ucode)
+            # print(ucode)
             encrypted_hex = execute_js.encrypt_data(data)
             data = {
                 'data': encrypted_hex
@@ -79,27 +80,27 @@ class YzyCollegeScorelineSpider(scrapy.Spider):
                     continue
                 minScore = info['minScore']
                 if minScore:
-                    #print(minScore)
+                    # print(minScore)
                     minScore = yzy.show_number(minScore)
                 avgScore = info['avgScore']
                 if avgScore:
-                    #print(avgScore)
+                    # print(avgScore)
                     avgScore = yzy.show_number(avgScore)
                 maxScore = info['maxScore']
                 if maxScore:
-                   # print(maxScore)
+                    # print(maxScore)
                     maxScore = yzy.show_number(maxScore)
                 lowSort = info['lowSort']
                 if lowSort:
-                    #print(lowSort)
+                    # print(lowSort)
                     lowSort = yzy.show_number(lowSort)
                 maxSort = info['maxSort']
                 if maxSort and isinstance(maxSort, str):
-                    #print(maxSort)
+                    # print(maxSort)
                     maxSort = yzy.show_number(maxSort)
                 enterNum = info['enterNum']
                 if enterNum:
-                    #print(enterNum)
+                    # print(enterNum)
                     enterNum = yzy.show_number(enterNum)
 
                 item['course'] = info['course']
