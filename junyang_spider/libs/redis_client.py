@@ -5,40 +5,41 @@
 @time 2020/7/3 11:37
 """
 from redis.connection import BlockingConnectionPool
+from random import choice
 from redis import Redis
 
 
 class RedisClient(object):
     """
-    Redis client 和SSDB协议一致 数据结构一致, 但部分方法不通用
+    Redis client
     Redis中代理存放的结构为hash：
-        原始代理存放在name为raw_proxy的hash中, key为代理的ip:por, value为代理属性的字典;
-        验证后的代理存放在name为useful_proxy的hash中, key为代理的ip:port, value为代理属性的字典;
+    key为ip:port, value为代理属性的字典;
     """
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, **kwargs):
         """
         init
-        :param name: hash name
         :param host: host
         :param port: port
         :param password: password
+        :param db: db
         :return:
         """
-        self.name = name
-        self.__conn = Redis(connection_pool=BlockingConnectionPool(**kwargs))
+        self.name = ""
+        kwargs.pop("username")
+        self.__conn = Redis(connection_pool=BlockingConnectionPool(decode_responses=True, **kwargs))
 
-    def get(self, proxy_str):
+    def get(self):
         """
-        从hash中获取对应的proxy, 使用前需要调用changeTable()
-        :param proxy_str: proxy str
+        返回一个代理
         :return:
         """
-        data = self.__conn.hget(name=self.name, key=proxy_str)
-        if data:
-            return data.decode('utf-8')
+        proxies = self.__conn.hkeys(self.name)
+        proxy = choice(proxies) if proxies else None
+        if proxy:
+            return self.__conn.hget(self.name, proxy)
         else:
-            return None
+            return False
 
     def put(self, proxy_obj):
         """
@@ -46,8 +47,21 @@ class RedisClient(object):
         :param proxy_obj: Proxy obj
         :return:
         """
-        data = self.__conn.hset(self.name, proxy_obj.proxy, proxy_obj.info_json)
+        data = self.__conn.hset(self.name, proxy_obj.proxy, proxy_obj.to_json)
         return data
+
+    def pop(self):
+        """
+        弹出一个代理
+        :return: dict {proxy: value}
+        """
+        proxies = self.__conn.hkeys(self.name)
+        for proxy in proxies:
+            proxy_info = self.__conn.hget(self.name, proxy)
+            self.__conn.hdel(self.name, proxy)
+            return proxy_info
+        else:
+            return False
 
     def delete(self, proxy_str):
         """
@@ -55,7 +69,7 @@ class RedisClient(object):
         :param proxy_str: proxy str
         :return:
         """
-        self.__conn.hdel(self.name, proxy_str)
+        return self.__conn.hdel(self.name, proxy_str)
 
     def exists(self, proxy_str):
         """
@@ -71,32 +85,15 @@ class RedisClient(object):
         :param proxy_obj:
         :return:
         """
-        self.__conn.hset(self.name, proxy_obj.proxy, proxy_obj.info_json)
-
-    def pop(self):
-        """
-        弹出一个代理
-        :return: dict {proxy: value}
-        """
-        # proxies = self.__conn.hkeys(self.name)
-        # if proxies:
-        #     proxy = random.choice(proxies)
-        #     value = self.__conn.hget(self.name, proxy)
-        #     self.delete(proxy)
-        #     return {'proxy': proxy.decode('utf-8') if PY3 else proxy,
-        #             'value': value.decode('utf-8') if PY3 and value else value}
-        return None
+        return self.__conn.hset(self.name, proxy_obj.proxy, proxy_obj.to_json)
 
     def getAll(self):
         """
-        列表形式返回所有代理, 使用changeTable指定hash name
+        字典形式返回所有代理, 使用changeTable指定hash name
         :return:
         """
         item_dict = self.__conn.hgetall(self.name)
-        if PY3:
-            return [value.decode('utf8') for key, value in item_dict.items()]
-        else:
-            return item_dict.values()
+        return item_dict
 
     def clear(self):
         """
@@ -105,7 +102,7 @@ class RedisClient(object):
         """
         return self.__conn.delete(self.name)
 
-    def getNumber(self):
+    def getCount(self):
         """
         返回代理数量
         :return:
@@ -115,11 +112,7 @@ class RedisClient(object):
     def changeTable(self, name):
         """
         切换操作对象
-        :param name: raw_proxy/useful_proxy
+        :param name:
         :return:
         """
         self.name = name
-
-
-if __name__=="__main__":
-    pass
