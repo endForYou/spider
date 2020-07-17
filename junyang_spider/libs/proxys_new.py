@@ -7,7 +7,7 @@
 import json
 
 
-class Proxy(object):
+class ProxyObj(object):
 
     def __init__(self, proxy, fail_count=0, region="", proxy_type="",
                  source="", is_used=0, expiration_time="", is_valid=1, operator=""):
@@ -66,19 +66,24 @@ class Proxy(object):
         return self._source
 
     @property
-    def check_count(self):
-        """ 代理检测次数 """
-        return self._check_count
+    def is_used(self):
+        """ 代理是否已经被使用 """
+        return self._is_used
 
     @property
-    def last_status(self):
-        """ 最后一次检测结果  1 -> 可用; 0 -> 不可用"""
-        return self._last_status
+    def expiration_time(self):
+        """ 过期时间"""
+        return self._expiration_time
 
     @property
-    def last_time(self):
-        """ 最后一次检测时间 """
-        return self._last_time
+    def is_valid(self):
+        """ 代理是否有效 """
+        return self._is_valid
+
+    @property
+    def operator(self):
+        """ 代理是否有效 """
+        return self._operator
 
     @property
     def to_dict(self):
@@ -88,9 +93,10 @@ class Proxy(object):
                 "region": self._region,
                 "type": self._type,
                 "source": self._source,
-                "check_count": self.check_count,
-                "last_status": self.last_status,
-                "last_time": self.last_time}
+                "is_used": self._is_used,
+                "expiration_time": self._expiration_time,
+                "is_valid": self._is_valid,
+                "operator": self._operator}
 
     @property
     def to_json(self):
@@ -114,14 +120,18 @@ class Proxy(object):
     def source(self, value):
         self._source = value
 
-    @check_count.setter
-    def check_count(self, value):
-        self._check_count = value
+    @is_used.setter
+    def is_used(self, value):
+        self._is_used = value
 
-    @last_status.setter
-    def last_status(self, value):
-        self._last_status = value
+    @expiration_time.setter
+    def expiration_time(self, value):
+        self._expiration_time = value
 
-    @last_time.setter
-    def last_time(self, value):
-        self._last_time = value
+    @is_valid.setter
+    def is_valid(self, value):
+        self._is_valid = value
+
+    @operator.setter
+    def operator(self, value):
+        self._operator = value

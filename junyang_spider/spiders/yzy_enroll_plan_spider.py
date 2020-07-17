@@ -33,7 +33,7 @@ class YzyEnrollPlanSpider(scrapy.Spider):
             use_unicode=True)
         cursor = connect.cursor(pymysql.cursors.DictCursor)
         sql = "select provinceId,uCodeNum from yzy_college_enroll_code "
-        #sql = "select provinceId,uCodeNum from yzy_college_enroll_code where uCodeNum='43_1772_0_0'"
+        # sql = "select provinceId,uCodeNum from yzy_college_enroll_code where uCodeNum='43_1772_0_0'"
         cursor.execute(sql)
         result = cursor.fetchall()
         cursor.close()
@@ -46,15 +46,18 @@ class YzyEnrollPlanSpider(scrapy.Spider):
         for college_enroll_code in college_enroll_codes:
             province_id = college_enroll_code['provinceId']
             ucode = college_enroll_code['uCodeNum']
-            url = self.base_url + "/Data/ScoreLines/Plans/Professions/Query"
-            year = 2019
+            # url = self.base_url + "/Data/ScoreLines/Plans/Professions/Query"
+            url = self.base_url + "/Data/youzy.data.scorelines.plan.query"
+            year = 2020
+            batch_list = [1, 2, 3, 4]
+            course = [0, 1]
             data = {
                 'year': year,
                 'ucodes': ucode
 
             }
             encrypted_hex = execute_js.encrypt_data(data)
-            #print(encrypted_hex)
+            # print(encrypted_hex)
             data = {
                 'data': encrypted_hex
             }

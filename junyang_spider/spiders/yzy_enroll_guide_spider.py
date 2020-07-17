@@ -32,7 +32,7 @@ class YzyMajorSpider(scrapy.Spider):
             charset='utf8',
             use_unicode=True)
         cursor = connect.cursor(pymysql.cursors.DictCursor)
-        sql = "select id,cid from college where cid is not NULL "
+        sql = "select id,cid from college where cid is not NULL and id >2520 "
         cursor.execute(sql)
         result = cursor.fetchall()
         return result
@@ -80,26 +80,27 @@ class YzyMajorSpider(scrapy.Spider):
                 title_new = md5(title.encode("utf-8")).hexdigest()
                 if title_new in existed_guides:
                     continue
-                item = YzyEnrollGuideItem()
-                href = li.css("a::attr('href')").extract_first()
-                item['college_id'] = college_id
-                item['title'] = title
-
-                item['publish_date'] = publish_date
-                url = self.base_url + href
-                yield scrapy.Request(url, meta={'item': item}, callback=self.parse_detail, dont_filter=True)
-                # if publish_date.find("2020") != -1 or title.find("2020") != -1:
-                #     item = YzyEnrollGuideItem()
-                #     href = li.css("a::attr('href')").extract_first()
-                #     item['college_id'] = college_id
-                #     item['title'] = title
+                # item = YzyEnrollGuideItem()
+                # href = li.css("a::attr('href')").extract_first()
+                # item['college_id'] = college_id
+                # item['title'] = title
                 #
-                #     item['publish_date'] = publish_date
-                #     url = self.base_url + href
-                #     yield scrapy.Request(url, meta={'item': item}, callback=self.parse_detail, dont_filter=True)
+                # item['publish_date'] = publish_date
+                # url = self.base_url + href
+                # yield scrapy.Request(url, meta={'item': item}, callback=self.parse_detail, dont_filter=True)
+                if publish_date.find("2020") != -1 or title.find("2020") != -1:
+                    item = YzyEnrollGuideItem()
+                    href = li.css("a::attr('href')").extract_first()
+                    item['college_id'] = college_id
+                    item['title'] = title
+
+                    item['publish_date'] = publish_date
+                    url = self.base_url + href
+                    yield scrapy.Request(url, meta={'item': item}, callback=self.parse_detail, dont_filter=True)
 
     def parse_detail(self, response):
         item = response.meta['item']
 
         item['content'] = response.css("div.content").extract_first()
-        yield item
+        if item['content']:
+            yield item

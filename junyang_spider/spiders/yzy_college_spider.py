@@ -50,7 +50,7 @@ class YzyCollegeSpider(scrapy.Spider):
 
     def parse_detail(self, response):
         item = response.meta['item']
-        print(item)
+        #print(item)
         item['creation_time'] = response.css("p.creation::text").extract_first()
         item['is_public'] = response.css("p.type::text").extract_first()
         item['school_type'] = response.css("p.classify::text").extract_first()

@@ -422,8 +422,6 @@ class YzyCollegeScorelineItem(scrapy.Item):
     lowSort = scrapy.Field()
     maxSort = scrapy.Field()
     enterNum = scrapy.Field()
-    countOfZJZY = scrapy.Field()
-    prvControlLines = scrapy.Field()
     province_id = scrapy.Field()
 
 

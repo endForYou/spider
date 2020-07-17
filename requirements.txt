@@ -8,3 +8,4 @@ Twisted==18.4.0
 pymongo==3.7.1
 pandas==0.24.2
 redis
+DBUtils

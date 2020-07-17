@@ -47,6 +47,7 @@ class YzyMajorScoreSpider(scrapy.Spider):
             province_id = college_enroll_code['provinceId']
             ucode = college_enroll_code['uCodeNum']
             url = self.base_url + "/Data/ScoreLines/Fractions/Professions/Query"
+            url = self.base_url + "/Data/youzy.data.scorelines.fractions.profession.query"
             course_types = [0, 1]
             years = [2019, ]
             # years = [2016, 2017, 2018, 2019]
