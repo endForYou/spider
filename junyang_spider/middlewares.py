@@ -163,17 +163,17 @@ class JunyangSpiderCustomDownloaderMiddleware(object):
 
     def process_request(self, request, spider):
         # proxy = my_proxy.get_random_proxy()
-        print(request.headers)
-        proxy = "39.104.97.230:10001"
-        # ip_port = 'secondtransfer.moguproxy.com:9001'
-        # proxy = {"http": "http://" + proxy, }
-        # app_key = 'RHc1bVI4cTBHc1ZodXpkMTpYZ0hlNXlSVG5WRE14NEJV'
-        # proxy_auth = "Basic " + app_key
-        # request.headers["Authorization"] = proxy_auth
-        auth = base64.b64encode(bytes("zhiya:kw303LL9", 'utf-8'))
-        request.headers['Proxy-Authorization'] = b'Basic ' + auth
-
-        request.meta['proxy'] = "http://{}".format(proxy)
+        # print(request.headers)
+        # proxy = "39.104.97.230:10001"
+        # # ip_port = 'secondtransfer.moguproxy.com:9001'
+        # # proxy = {"http": "http://" + proxy, }
+        # # app_key = 'RHc1bVI4cTBHc1ZodXpkMTpYZ0hlNXlSVG5WRE14NEJV'
+        # # proxy_auth = "Basic " + app_key
+        # # request.headers["Authorization"] = proxy_auth
+        # auth = base64.b64encode(bytes("zhiya:kw303LL9", 'utf-8'))
+        # request.headers['Proxy-Authorization'] = b'Basic ' + auth
+        #
+        # request.meta['proxy'] = "http://{}".format(proxy)
         # print(request.meta['proxy'])
         # Called for each request that goes through the downloader
         # middleware.
@@ -187,8 +187,8 @@ class JunyangSpiderCustomDownloaderMiddleware(object):
         return None
 
     def process_response(self, request, response, spider):
-        print(response.headers)
-        print(response.text)
+        # print(response.headers)
+        # print(response.text)
         # Called with the response returned from the downloader.
         # Must either;
         # - return a Response object

@@ -61,7 +61,7 @@ class Proxy:
         request = WebRequest.WebRequest()
         r = request.get(url, timeout=10)
         data_list = json.loads(r.content)['data']
-        #print(data_list)
+        # print(data_list)
         for data in data_list:
             # print(222222)
             # print(data)

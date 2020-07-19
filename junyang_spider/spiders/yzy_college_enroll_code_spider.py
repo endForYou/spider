@@ -59,11 +59,11 @@ class YzyCollegeEnrollCodeSpider(scrapy.Spider):
         return result
 
     def start_requests(self):
-        provinces = self.get_provinces_from_db()
+        # provinces = self.get_provinces_from_db()
         colleges = self.get_colleges_from_db()
         # print(colleges)
-        for province in provinces:
-            province_id = province['ProvinceId']
+        province_list = [839, 849]
+        for province_id in province_list:
             for college in colleges:
                 college_id = college['college_id']
                 url = self.base_url + "/Data/ScoreLines/UCodes/QueryList"
@@ -77,6 +77,7 @@ class YzyCollegeEnrollCodeSpider(scrapy.Spider):
                 }
                 # print(data, college_id, province_id)
                 yield scrapy.FormRequest(url, method="POST", formdata=data)
+                # yield scrapy.FormRequest(url, method="POST", formdata=data)
 
     def parse(self, response):
         # 学校列表

@@ -535,7 +535,7 @@ class YzyCollegeEnrollCodePipline(object):
     # 处理sql函数
     def insert_into(self, cursor, item):
         # 创建sql语句
-        sql = '''INSERT INTO yzy_college_enroll_code (provinceId,provinceName,uCodeNum,admissCode,collegeId,collegeName
+        sql = '''INSERT INTO yzy_college_enroll_code_new (provinceId,provinceName,uCodeNum,admissCode,collegeId,collegeName
 ,sort,isOld,codeChangeYear,str_id)
  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 '''
@@ -600,8 +600,8 @@ class YzyCollegeScorelinePipline(object):
     def insert_into(self, cursor, item):
         # 创建sql语句
         sql = '''INSERT INTO yzy_college_scoreline (year,course,batch,batchName,uCode,chooseLevel
-,lineDiff,minScore,avgScore,maxScore,lowSort,maxSort,enterNum,countOfZJZY,prvControlLines,province_id)
- VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+,lineDiff,minScore,avgScore,maxScore,lowSort,maxSort,enterNum,province_id)
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 '''
         # 执行sql语句
         year = item['year']
@@ -617,12 +617,10 @@ class YzyCollegeScorelinePipline(object):
         lowSort = item['lowSort']
         maxSort = item['maxSort']
         enterNum = item['enterNum']
-        countOfZJZY = item['countOfZJZY']
-        prvControlLines = item['prvControlLines']
         province_id = item['province_id']
         cursor.execute(sql, (year, course, batch, batchName, uCode, chooseLevel
-                             , lineDiff, minScore, avgScore, maxScore, lowSort, maxSort, enterNum, countOfZJZY,
-                             prvControlLines, province_id))
+                             , lineDiff, minScore, avgScore, maxScore, lowSort, maxSort, enterNum,
+                             province_id))
         # 错误函数
 
     def handle_error(self, failure, item, spider):
@@ -744,47 +742,49 @@ class YzyMajorPipline(object):
         return item
 
         # 处理sql函数
+
     def insert_into(self, cursor, item):
-            # 创建sql语句
-            sql = '''INSERT INTO yzy_major (code,name,grade,category,category_code,subcategory
+        # 创建sql语句
+        sql = '''INSERT INTO yzy_major (code,name,grade,category,category_code,subcategory
     ,subcategory_code)
      VALUES (%s,%s,%s,%s,%s,%s,%s)
     '''
-            # 执行sql语句
-            code = item['major_code']
-            name = item['major_name']
-            grade = item['grade']
-            category = item['category_name']
-            category_code = item['category_code']
-            subcategory = item['subcategory_name']
-            subcategory_code = item['subcategory_code']
+        # 执行sql语句
+        code = item['major_code']
+        name = item['major_name']
+        grade = item['grade']
+        category = item['category_name']
+        category_code = item['category_code']
+        subcategory = item['subcategory_name']
+        subcategory_code = item['subcategory_code']
 
-            cursor.execute(sql, (code, name, grade, category, category_code, subcategory
-                                 , subcategory_code))
-            # 错误函数
-#
-#     def insert_into(self, cursor, item):
-#         # 创建sql语句
-#         sql = '''INSERT INTO yzy_major_details (courses,description,employment,inherit_secondary_vocational,inherit_undergraduate
-# ,job_qualification_certificate,knowledge,major_name,major_code,grade,schooling_time,degree)
-#      VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-#     '''
-#         # 执行sql语句
-#         code = item['major_code']
-#         name = item['major_name']
-#         grade = item['grade']
-#         courses = item['courses']
-#         description = item['description']
-#         employment = item['employment']
-#         inherit_secondary_vocational = item['inherit_secondary_vocational']
-#         inherit_undergraduate = item['inherit_undergraduate']
-#         job_qualification_certificate = item['job_qualification_certificate']
-#         knowledge = item['knowledge']
-#         schooling_time = item['schooling_time']
-#         degree = item['degree']
-#         cursor.execute(sql, (courses, description, employment, inherit_secondary_vocational, inherit_undergraduate
-#                              , job_qualification_certificate, knowledge, name, code, grade, schooling_time, degree))
+        cursor.execute(sql, (code, name, grade, category, category_code, subcategory
+                             , subcategory_code))
         # 错误函数
+
+    #
+    #     def insert_into(self, cursor, item):
+    #         # 创建sql语句
+    #         sql = '''INSERT INTO yzy_major_details (courses,description,employment,inherit_secondary_vocational,inherit_undergraduate
+    # ,job_qualification_certificate,knowledge,major_name,major_code,grade,schooling_time,degree)
+    #      VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    #     '''
+    #         # 执行sql语句
+    #         code = item['major_code']
+    #         name = item['major_name']
+    #         grade = item['grade']
+    #         courses = item['courses']
+    #         description = item['description']
+    #         employment = item['employment']
+    #         inherit_secondary_vocational = item['inherit_secondary_vocational']
+    #         inherit_undergraduate = item['inherit_undergraduate']
+    #         job_qualification_certificate = item['job_qualification_certificate']
+    #         knowledge = item['knowledge']
+    #         schooling_time = item['schooling_time']
+    #         degree = item['degree']
+    #         cursor.execute(sql, (courses, description, employment, inherit_secondary_vocational, inherit_undergraduate
+    #                              , job_qualification_certificate, knowledge, name, code, grade, schooling_time, degree))
+    # 错误函数
 
     def handle_error(self, failure, item, spider):
         print(failure)
@@ -831,7 +831,7 @@ class YzyEnrollPlanPipline(object):
     # 处理sql函数
     def insert_into(self, cursor, item):
         # 创建sql语句
-        sql = '''INSERT INTO yzy_enroll_plan (year,courseType,batch,batchName,uCode,majorCode
+        sql = '''INSERT INTO yzy_enroll_plan_1 (year,courseType,batch,batchName,uCode,majorCode
 ,professionName,professionCode,planNum,cost,learnYear,province_id)
  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 '''

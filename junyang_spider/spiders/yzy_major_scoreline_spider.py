@@ -10,6 +10,7 @@ import pymysql
 from junyang_spider import settings
 import json
 from junyang_spider.libs import execute_js, yzy
+from junyang_spider.libs.db_connection import DBConnection
 
 
 class YzyMajorScoreSpider(scrapy.Spider):
@@ -21,100 +22,101 @@ class YzyMajorScoreSpider(scrapy.Spider):
 
     }
 
-    @classmethod
-    def get_colleges_enroll_code_from_db(cls):
-        connect = pymysql.connect(
-            host=settings.MYSQL_HOST,
-            port=settings.MYSQL_PORT,
-            db=settings.MYSQL_DBNAME,
-            user=settings.MYSQL_USER,
-            passwd=settings.MYSQL_PASSWD,
-            charset='utf8',
-            use_unicode=True)
-        cursor = connect.cursor(pymysql.cursors.DictCursor)
-        sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId=851"
-        # sql = "select provinceId,uCodeNum from yzy_college_enroll_code where provinceId in (select ProvinceId from yzy_province where Used=1)"
-        cursor.execute(sql)
-        result = cursor.fetchall()
-        cursor.close()
-        connect.close()
-        return result
-
     def start_requests(self):
-        college_enroll_codes = self.get_colleges_enroll_code_from_db()
+        db_connect = DBConnection()
+        colleges = db_connect.get_yzy_colleges()
+        provinces = db_connect.get_yzy_provinces()
+        db_connect.tear_down()
+        # provinces = self.get_yzy_provinces()
         # print(colleges)
-        for college_enroll_code in college_enroll_codes:
-            province_id = college_enroll_code['provinceId']
-            ucode = college_enroll_code['uCodeNum']
-            url = self.base_url + "/Data/ScoreLines/Fractions/Professions/Query"
-            url = self.base_url + "/Data/youzy.data.scorelines.fractions.profession.query"
-            course_types = [0, 1]
-            years = [2019, ]
-            # years = [2016, 2017, 2018, 2019]
-            year_from = 2016
-            for course in course_types:
-                for year in years:
-                    data = {
-                        'uCode': ucode, 'batch': 0, 'courseType': course, 'yearFrom': year_from, 'yearTo': year
-                    }
-                    encrypted_hex = execute_js.encrypt_data(data)
-                    data = {
-                        'data': encrypted_hex
-                    }
-                    # print(data, college_id, province_id)
-                    meta_data = {
-                        'province_id': province_id
-                    }
-                    yield scrapy.FormRequest(url, meta=meta_data, method="POST", formdata=data)
+        # province_list = [839, 849]
+        url = self.base_url + "/Data/youzy.data.scorelines.fractions.profession.query"
+        year = 2019
+        batch_list = [1, 2, 3, 4]
+        course_list = [0, 1]
+        for province in provinces:
+            # url = self.base_url + "/Data/ScoreLines/Plans/Professions/Query"
+            province_id = province['ProvinceId']
+            for college in colleges:
+                college_id = college['yzy_college_id']
+                for batch_id in batch_list:
+                    for course_id in course_list:
+                        data_dict = {
+                            'batch': str(batch_id),
+                            'year': str(year),
+                            'provinceId': province_id,
+                            'collegeId': str(college_id),
+                            'courseId': course_id
+                        }
+                        encrypted_hex = execute_js.encrypt_data(data_dict)
+                        # print(encrypted_hex)
+                        data = {
+                            'data': encrypted_hex
+                        }
+                        # print(data_dict)
+                        # print(data)
+                        # print(data, college_id, province_id)
+                        meta_data = {
+                            'province_id': province_id,
+                            'year': year,
+                            'course_id': course_id,
+                            'batch_id': batch_id
+                        }
+                        yield scrapy.Request(url, meta=meta_data, method="POST", body=json.dumps(data))
 
     def parse(self, response):
         # 学校列表
         # print(response.text)
         province_id = response.meta['province_id']
-        infos = json.loads(response.text)['result']
-        for info in infos:
-            # meta = response.meta
-            item = YzyMajorScoreLineItem()
-            item['year'] = info['year']
-            # 只要2016及以后的数据
-            if item['year'] < 2016:
-                continue
-            minScore = info['minScore']
-            if minScore:
-                minScore = yzy.show_number(minScore)
-            avgScore = info['avgScore']
-            if avgScore:
-                avgScore = yzy.show_number(avgScore)
-            maxScore = info['maxScore']
-            if maxScore:
-                maxScore = yzy.show_number(maxScore)
-            lowSort = info['lowSort']
-            if lowSort:
-                lowSort = yzy.show_number(lowSort)
-            maxSort = info['maxSort']
-            if maxSort and isinstance(maxSort, str):
-                # print(maxSort)
-                maxSort = yzy.show_number(maxSort)
-            enterNum = info['enterNum']
-            if enterNum:
-                enterNum = yzy.show_number(enterNum)
-            item['course'] = info['courseType']
-            item['batch'] = info['batch']
-            item['batchName'] = info['batchName']
-            item['uCode'] = info['uCode']
-            item['chooseLevel'] = info['chooseLevel']
-            item['lineDiff'] = info['lineDiff']
-            item['majorCode'] = info['majorCode']
-            item['professionName'] = yzy.show_str(info['professionName']) if info['professionName'] else None
-            item['professionCode'] = yzy.show_str(info['professionCode']) if info['professionCode'] else None
-            item['remarks'] = info['remarks']
-            item['minScore'] = minScore
-            item['avgScore'] = avgScore
-            item['maxScore'] = maxScore
-            item['lowSort'] = lowSort
-            item['maxSort'] = maxSort
-            item['enterNum'] = enterNum
-            item['countOfZJZY'] = info['countOfZJZY']
-            item['province_id'] = province_id
-            item['year'] = info['year']
-            yield item
+        year = response.meta['year']
+        batch_id = response.meta['batch_id']
+        course_id = response.meta['course_id']
+        ucodes = json.loads(response.text)['result']['uCodes']
+        if ucodes:
+            for ucode_dict in ucodes:
+                college_enroll_code = ucode_dict['collegeCode']
+                ucode = ucode_dict['uCode']
+                fractions = ucode_dict['fractions']
+                for info in fractions:
+                    item = YzyMajorScoreLineItem()
+                    item['year'] = info['year']
+                    # 只要2016及以后的数据
+                    minScore = info['minScore']
+                    if minScore:
+                        minScore = yzy.show_str(minScore)
+                    avgScore = info['avgScore']
+                    if avgScore:
+                        avgScore = yzy.show_str(avgScore)
+                    maxScore = info['maxScore']
+                    if maxScore:
+                        maxScore = yzy.show_str(maxScore)
+                    lowSort = info['lowSort']
+                    if lowSort:
+                        lowSort = yzy.show_str(lowSort)
+                    maxSort = info['maxSort']
+                    # if maxSort and isinstance(maxSort, str):
+                    #     # print(maxSort)
+                    #     maxSort = yzy.show_number(maxSort)
+                    enterNum = info['enterNum']
+                    if enterNum:
+                        enterNum = yzy.show_str(enterNum)
+                    item['course'] = course_id
+                    item['batch'] = info['batch']
+                    item['batchName'] = info['batchName']
+                    item['uCode'] = ucode
+                    item['chooseLevel'] = info['chooseLevel']
+                    item['lineDiff'] = None
+                    item['majorCode'] = info['majorCode']
+                    item['professionName'] = yzy.show_str(info['professionName']) if info['professionName'] else None
+                    item['professionCode'] = None
+                    item['remarks'] = None
+                    item['minScore'] = minScore
+                    item['avgScore'] = avgScore
+                    item['maxScore'] = maxScore
+                    item['lowSort'] = lowSort
+                    item['maxSort'] = maxSort
+                    item['enterNum'] = enterNum
+                    item['countOfZJZY'] = None
+                    item['province_id'] = province_id
+                    item['year'] = year
+                    yield item

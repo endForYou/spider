@@ -621,7 +621,7 @@ var Counter = function (initialValue) {
         initialValue = 1;
     }
 
-    if (typeof(initialValue) === 'number') {
+    if (typeof (initialValue) === 'number') {
         this._counter = createArray(16);
         this.setValue(initialValue);
 
@@ -631,7 +631,7 @@ var Counter = function (initialValue) {
 }
 
 Counter.prototype.setValue = function (value) {
-    if (typeof(value) !== 'number' || parseInt(value) != value) {
+    if (typeof (value) !== 'number' || parseInt(value) != value) {
         throw new Error('invalid counter value (must be an integer)');
     }
 
@@ -792,7 +792,7 @@ if (typeof exports !== 'undefined') {
     // RequireJS/AMD
     // http://www.requirejs.org/docs/api.html
     // https://github.com/amdjs/amdjs-api/wiki/AMD
-} else if (typeof(define) === 'function' && define.amd) {
+} else if (typeof (define) === 'function' && define.amd) {
     define(aesjs);
 
     // Web Browsers

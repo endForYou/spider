@@ -43,7 +43,7 @@ CONCURRENT_REQUESTS = 1
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 0.2
+DOWNLOAD_DELAY = 1.0
 # 0.5 * DOWNLOAD_DELAY和1.5 * 之间的随机间隔
 RANDOMIZE_DOWNLOAD_DELAY = True
 
@@ -60,8 +60,8 @@ COOKIES_ENABLED = False
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-        'Cookie': 'UM_distinctid=172e602865d127-02ab4bbbae8b5f-4353761-1fa400-172e602865e3d1; connect.sid=s%3AIA4ohb_eUeZw8CvONFcdOOYdkg0zfTKl.in2vgkY465gWSzIOkJG1NMczaeGd8VJYq4FxxaGKHRg; youzy.pv4y.type=toC; youzy.pv4y.uid=e559340d34eb5c56',
-   # 'Content-Type': 'application/json'
+    'Cookie': 'UM_distinctid=172c24e1e3b2b5-04f562c4778a47-14396257-fa000-172c24e1e3c8a5; connect.sid=s%3A0XSv9MheyRObTbSNhSynjSfPwiTfH7jZ.ooy6QqQxo30AJfEUg%2FdgmscOS3Efj0beYq8ZqCVUm1I; youzy.pv4y.uid=jbqbd5i/twjRnIo2ofiCog==; youzy.pv4y.type=toC',
+    'Content-Type': 'application/json'
 }
 
 # Enable or disable spider middlewares
