@@ -28,12 +28,13 @@ class YzyEnrollPlanSpider(scrapy.Spider):
         db_connect.tear_down()
         # provinces = self.get_yzy_provinces()
         # print(colleges)
-        province_list = [839, 849]
+        province_list = [849, ]
         for province_id in province_list:
             # url = self.base_url + "/Data/ScoreLines/Plans/Professions/Query"
             url = self.base_url + "/Data/youzy.data.scorelines.plan.query"
             year = 2020
-            batch_list = [1, 2, 3, 4]
+            # 按不同的省份设置
+            batch_list = [1, 2, 3]
             course_list = [0, 1]
             for college in colleges:
                 college_id = college['yzy_college_id']
@@ -73,7 +74,7 @@ class YzyEnrollPlanSpider(scrapy.Spider):
         batch_id = response.meta['batch_id']
         course_id = response.meta['course_id']
         if response.text:
-            print(response.text,1111)
+            print(response.text, 1111)
             ucodes = json.loads(response.text)['result']['uCodes']
             if ucodes:
                 for ucode_dict in ucodes:
@@ -82,7 +83,7 @@ class YzyEnrollPlanSpider(scrapy.Spider):
                     fractions = ucode_dict['fractions']
                     for fraction in fractions[1:]:
                         data_type = fraction['dataType']
-                        #print(data_type)
+                        # print(data_type)
                         item = YzyEnrollPlanItem()
                         item['courseType'] = course_id
                         item['batch'] = batch_id
@@ -91,14 +92,14 @@ class YzyEnrollPlanSpider(scrapy.Spider):
                         item['province_id'] = province_id
 
                         item['batchName'] = fractions[0]['batchName']
-                        #item['batchName'] = None  # 先初始化
+                        # item['batchName'] = None  # 先初始化
                         # if data_type == 1:
                         #     print(1111111111111)
                         # else:
-                            # if data_type == 2:
-                            # meta = response.meta
+                        # if data_type == 2:
+                        # meta = response.meta
 
-                            # 只要2016及以后的数据
+                        # 只要2016及以后的数据
                         item['majorCode'] = fraction['majorCode']
                         item['professionName'] = yzy.show_str(fraction['name']) if fraction[
                             'name'] else None

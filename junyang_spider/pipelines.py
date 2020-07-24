@@ -831,7 +831,7 @@ class YzyEnrollPlanPipline(object):
     # 处理sql函数
     def insert_into(self, cursor, item):
         # 创建sql语句
-        sql = '''INSERT INTO yzy_enroll_plan_1 (year,courseType,batch,batchName,uCode,majorCode
+        sql = '''INSERT INTO yzy_enroll_plan_2020 (year,courseType,batch,batchName,uCode,majorCode
 ,professionName,professionCode,planNum,cost,learnYear,province_id)
  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 '''

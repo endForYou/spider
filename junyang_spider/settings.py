@@ -16,17 +16,19 @@ BOT_NAME = 'junyang_spider'
 SPIDER_MODULES = ['junyang_spider.spiders']
 NEWSPIDER_MODULE = 'junyang_spider.spiders'
 
-USER_AGENT_LIST = [
-    "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
-    "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
-    "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0;",
-    "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)",
-    " Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv,2.0.1) Gecko/20100101 Firefox/4.0.1",
-    " Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE)",
-
-]
-user_agents = random.choice(USER_AGENT_LIST)
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36"
+# USER_AGENT_LIST = [
+#     # "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
+#     # "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
+#     # "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0;",
+#     # "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)",
+#     # " Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv,2.0.1) Gecko/20100101 Firefox/4.0.1",
+#     # " Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE)",
+#     # "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36",
+#     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36",
+#
+# ]
+# user_agents = random.choice(USER_AGENT_LIST)
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
 # if user_agents:
 #     USER_AGENT = user_agents
 # else:
@@ -43,7 +45,7 @@ CONCURRENT_REQUESTS = 1
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 1.0
+DOWNLOAD_DELAY = 2.0
 # 0.5 * DOWNLOAD_DELAY和1.5 * 之间的随机间隔
 RANDOMIZE_DOWNLOAD_DELAY = True
 
@@ -60,7 +62,7 @@ COOKIES_ENABLED = False
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-    'Cookie': 'UM_distinctid=172c24e1e3b2b5-04f562c4778a47-14396257-fa000-172c24e1e3c8a5; connect.sid=s%3A0XSv9MheyRObTbSNhSynjSfPwiTfH7jZ.ooy6QqQxo30AJfEUg%2FdgmscOS3Efj0beYq8ZqCVUm1I; youzy.pv4y.uid=jbqbd5i/twjRnIo2ofiCog==; youzy.pv4y.type=toC',
+    'Cookie': 'UM_distinctid=1736abb707db85-0398b059c5da14-b7a1334-1fa400-1736abb707eb32; connect.sid=s%3Aos1S0a4z2t1fkXNlG0Xu5g1hb_XWu3QA.CRJ%2FVnjJmGTS9MdyVVu40w2f9csUe5urXWf%2F%2Fmrf1AE; youzy.pv4y.uid=RGcXIY8EemSfeAQVvj1f1w==; youzy.pv4y.type=toC',
     'Content-Type': 'application/json'
 }
 
