@@ -8,6 +8,7 @@ import traceback
 
 import pymysql
 from sshtunnel import SSHTunnelForwarder
+import os
 
 
 # 通过SSH链接数据库
@@ -20,11 +21,12 @@ class DBSSHHelper:
 
     # 连接数据库
     def connection_database(self, db="oms"):
+
         try:
             self.server = SSHTunnelForwarder(
                 ssh_address_or_host=("42.194.215.214", 22),  # ssh跳转机的地址
                 ssh_username="test_user",  # ssh的用户名
-                ssh_pkey="id_rsa",  # ssh私钥地址
+                ssh_pkey=os.path.join(os.path.dirname(__file__), "id_rsa"),  # ssh私钥地址
                 # ssh_private_key_password="",  # ssh私钥密码
                 # local_bind_address=("0.0.0.0", 10022),
                 remote_bind_address=("rm-hp3ly1uji477469lcko.mysql.huhehaote.rds.aliyuncs.com", 3306))  # 数据库地址
