@@ -419,5 +419,5 @@ if __name__ == '__main__':
     scheduler = BlockingScheduler(jobstores=jobstores)
     scheduler.add_job(update_article_info, 'cron', jobstore='redis', hour=8)
     scheduler.add_job(update_top_search, 'interval', jobstore='redis', days=7)
-    scheduler.add_job(update_province_policy_linux, 'interval', jobstore='redis', minutes=15)
+    scheduler.add_job(update_province_policy_linux, 'interval', jobstore='redis', minutes=1)
     scheduler.start()
