@@ -123,6 +123,6 @@ if __name__ == '__main__':
     scheduler = BlockingScheduler(jobstores=jobstores)
 
     scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_gd_policy(), 'cron', jobstore='redis', hour=8)
+    scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
 
     scheduler.start()
