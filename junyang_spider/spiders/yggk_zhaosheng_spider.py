@@ -8,7 +8,7 @@ class YggkZhaoShengSpider(scrapy.Spider):
     name = "yggk_zhaosheng"
     allowed_domains = ["gaokao.chsi.com.cn"]
     start_urls = [
-        "http://gaokao.chsi.com.cn/zsgs/zhangcheng/listVerifedZszc--method-index,lb-1,ssdm-00,start-0.dhtml",
+        "https://gaokao.chsi.com.cn/zsgs/zhangcheng/listVerifedZszc--method-index,lb-1.dhtml",
 
     ]
 

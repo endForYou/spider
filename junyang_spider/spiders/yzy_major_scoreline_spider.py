@@ -31,7 +31,7 @@ class YzyMajorScoreSpider(scrapy.Spider):
         # print(colleges)
         # province_list = [839, 849]
         url = self.base_url + "/Data/youzy.data.scorelines.fractions.profession.query"
-        year = 2019
+        year = 2020
         batch_list = [1, 2, 3, 4]
         course_list = [0, 1]
         for province in provinces:

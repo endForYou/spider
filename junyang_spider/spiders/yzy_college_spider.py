@@ -10,10 +10,10 @@ from junyang_spider.items import YzyCollegeItem
 
 class YzyCollegeSpider(scrapy.Spider):
     name = "yzy_college"
-    allowed_domains = ["www.youzy.cn"]
-    base_url = "https://www.youzy.cn"
+    allowed_domains = ["ha-sina.youzy.cn"]
+    base_url = "https://ha-sina.youzy.cn"
     start_urls = [
-        "https://www.youzy.cn/tzy/search/colleges/collegeList",
+        "https://ha-sina.youzy.cn/tzy/search/colleges/collegeList",
         # "http://www.gaokaoq.com/major.html?level=2"
 
     ]
@@ -23,7 +23,7 @@ class YzyCollegeSpider(scrapy.Spider):
     }
 
     def start_requests(self):
-        for page in range(1, 143):
+        for page in range(1, 146):
             url = self.base_url + "/tzy/search/colleges/collegeList?page=" + str(page)
 
             yield scrapy.Request(url, meta={"sid": page}, method="GET", dont_filter=True)
