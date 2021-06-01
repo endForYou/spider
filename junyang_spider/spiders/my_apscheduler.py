@@ -580,4 +580,4 @@ if __name__ == '__main__':
     scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
     scheduler.add_job(crawl_hb_policy, 'cron', jobstore='redis', hour=8)
     scheduler.add_job(crawl_fj_policy, 'cron', jobstore='redis', hour=8)
-    # scheduler.start()
+    scheduler.start()
