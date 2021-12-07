@@ -19,17 +19,19 @@ from apscheduler.jobstores.redis import *
 from junyang_spider.libs.db_by_ssh import DBSSHHelper
 from hashlib import md5
 from bs4 import BeautifulSoup as bs
+from bs4 import CData
 import urllib.parse
 import time
 import re
+
+my_redis = redis.StrictRedis(db=3, host="159.75.224.137", port=6399,
+                             password="rYa+wq10dFTWzYz8FeZgsWRygyKfLKULSRdKfRnEgSk=", decode_responses=True)
 
 
 def update_article_info():
     url = "https://xwapp.moe.gov.cn/api/home/homeindex?page=1"
     res = requests.get(url)
     items = res.json()['data']['items']
-    my_redis = redis.StrictRedis(db=2, host="42.194.210.56", port=6399,
-                                 password="junyang@139", decode_responses=True)
     params = []
     # 爬取数据
     for item in items:
@@ -220,8 +222,7 @@ def crawl_hunan_policy():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
     }
-    my_redis = redis.StrictRedis(db=2, host="42.194.210.56", port=6399,
-                                 password="junyang@139", decode_responses=True)
+
     res = requests.get(url, headers=headers)
     soup = bs(res.text, "lxml")
     li_list = soup.select('div.zklb_list li')
@@ -249,8 +250,7 @@ def crawl_gd_policy():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
     }
-    my_redis = redis.StrictRedis(db=2, host="42.194.210.56", port=6399,
-                                 password="junyang@139", decode_responses=True)
+
     res = requests.get(url, headers=headers)
     soup = bs(res.text, "lxml")
     li_list = soup.select('div.content > ul.list > li')
@@ -273,29 +273,29 @@ def crawl_gd_policy():
 
 
 def crawl_hb_policy():
-    url = "http://zsxx.e21.cn/e21html/zhaosheng/listihszbkxth1.html"
+    url = "http://gaokao.hbccks.cn/zxzc/gkzx/"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
     }
-    my_redis = redis.StrictRedis(db=2, host="42.194.210.56", port=6399,
-                                 password="junyang@139", decode_responses=True)
+
     res = requests.get(url, headers=headers)
 
     soup = bs(res.content.decode("gbk"), "lxml")
-    li_list = soup.select("[width='700'] tr")
+    #print(soup)
+    li_list = soup.select("ul-h li")
 
     params = []
-    for li in li_list[0:-1]:
+    for li in li_list:
         title = li.select_one("a").get_text()
         title_md5 = md5(title.encode("utf-8")).hexdigest()
         # print(title)
+        # print(url, create_time)
         if not my_redis.hexists('province_policy', title_md5):
-            url = "http://zsxx.e21.cn/" + li.select_one("a").get("href")
-            create_time = li.select_one("td.gray12").text
+            url = li.select_one("a").get("href")
+            create_time = li.select_one("span").text.replace("/", "-")
             # print(url,create_time)
-            print(url)
             my_redis.hset('province_policy', title_md5, create_time + title)
             params.append({
                 "title": title,
@@ -314,8 +314,7 @@ def crawl_fj_policy():
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
     }
-    my_redis = redis.StrictRedis(db=2, host="42.194.210.56", port=6399,
-                                 password="junyang@139", decode_responses=True)
+
     res = requests.get(url, headers=headers)
 
     soup = bs(res.content.decode("UTF-8"), "lxml")
@@ -339,6 +338,110 @@ def crawl_fj_policy():
                 "link": url,
                 "create_time": create_time,
                 "province_id": 350000
+            })
+    if params:
+        insert_into_province_policy(params)
+
+
+def crawl_gz_policy():
+    url = "http://zsksy.guizhou.gov.cn/ptgk/zkzc/"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+    }
+
+    res = requests.get(url, headers=headers)
+
+    soup = bs(res.content.decode("UTF-8"), "lxml")
+    # print(soup)
+    li_list = soup.select("li.news")
+    params = []
+    for li in li_list:
+        title = li.select_one("a").get('title')
+        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        # print(title)
+
+        if not my_redis.hexists('province_policy', title_md5):
+            create_time = li.select_one("span.news_date").text
+            # print(url,create_time)
+            url = li.select_one("a").get("href")
+            my_redis.hset('province_policy', title_md5, create_time + title)
+            params.append({
+                "title": title,
+                "link": url,
+                "create_time": create_time,
+                "province_id": 520000
+            })
+    if params:
+        insert_into_province_policy(params)
+
+
+def crawl_yn_policy():
+    url = "https://www.ynzs.cn/html/web/ptgxzs/index.html"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+    }
+
+    res = requests.get(url, headers=headers)
+
+    soup = bs(res.content.decode("UTF-8"), "lxml")
+    # print(soup)
+    li_list = soup.select("div.listbox > a")
+    params = []
+    for li in li_list:
+        title = li.select_one("h2").get_text()
+        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        # print(title)
+
+        if not my_redis.hexists('province_policy', title_md5):
+            create_time = li.select_one("em").text.replace("年", "-").replace("月", "-").replace("日", "-")
+            # print(url,create_time)
+            url = li.get("href")
+            my_redis.hset('province_policy', title_md5, create_time + title)
+            params.append({
+                "title": title,
+                "link": url,
+                "create_time": create_time,
+                "province_id": 530000
+            })
+    if params:
+        insert_into_province_policy(params)
+
+
+def crawl_jx_policy():
+    url = "http://www.jxeea.cn/col/col26677/index.html"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+    }
+
+    res = requests.get(url, headers=headers)
+
+    soup = bs(res.content.decode("UTF-8"), "lxml")
+    page = soup.select("ul.content_right_list")
+    params = []
+    s = re.findall(r'<li class="content_right_item">(.*?)</li>', str(page))
+    count = 0
+    for data in s:
+        count += 1
+        if count > 20:
+            break
+        li = bs(data, "lxml")
+        title = li.select_one("a").get("title")
+        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        if not my_redis.hexists('province_policy', title_md5):
+            url = li.select_one("a").get("href")
+            create_time = li.select_one("div.content_right_date").text.replace(" ", "")
+            my_redis.hset('province_policy', title_md5, create_time + title)
+            params.append({
+                "title": title,
+                "link": url,
+                "create_time": create_time,
+                "province_id": 360000
             })
     if params:
         insert_into_province_policy(params)
@@ -551,27 +654,33 @@ def update_province_policy_linux():
 
 
 if __name__ == '__main__':
+    # crawl_jx_policy()
+    # crawl_yn_policy()
+    # crawl_gz_policy()
     # crawl_fj_policy()
+    # crawl_hunan_policy()
+    # crawl_hb_policy()
+    # crawl_gd_policy()
     conf = {
-        'host': "42.194.210.56",
+        'host': "159.75.224.137",
         'port': 6399,
 
-        'password': "junyang@139",
-        # 'decode_responses': True
+        'password': "rYa+wq10dFTWzYz8FeZgsWRygyKfLKULSRdKfRnEgSk=",
+        'decode_responses': True
     }
-    # executors = {
-    #     'default': ThreadPoolExecutor(10),  # 默认线程数
-    #     'processpool': ProcessPoolExecutor(3)  # 默认进程
-    # }
+    # # executors = {
+    # #     'default': ThreadPoolExecutor(10),  # 默认线程数
+    # #     'processpool': ProcessPoolExecutor(3)  # 默认进程
+    # # }
     jobstores = {
-        'redis': RedisJobStore(db=2, **conf),
+        'redis': RedisJobStore(db=3, **conf),
 
     }
-    #
-    # # job_defaults = {
-    # #     'coalesce': False,
-    # #     'max_instances': 3
-    # # }
+    # #
+    # # # job_defaults = {
+    # # #     'coalesce': False,
+    # # #     'max_instances': 3
+    # # # }
     scheduler = BlockingScheduler(jobstores=jobstores)
     scheduler.add_job(update_article_info, 'cron', jobstore='redis', hour=8)
     scheduler.add_job(update_top_search, 'interval', jobstore='redis', days=7)
@@ -580,4 +689,7 @@ if __name__ == '__main__':
     scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
     scheduler.add_job(crawl_hb_policy, 'cron', jobstore='redis', hour=8)
     scheduler.add_job(crawl_fj_policy, 'cron', jobstore='redis', hour=8)
+    scheduler.add_job(crawl_jx_policy, 'cron', jobstore='redis', hour=8)
+    scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
+    scheduler.add_job(crawl_gz_policy, 'cron', jobstore='redis', hour=8)
     scheduler.start()
