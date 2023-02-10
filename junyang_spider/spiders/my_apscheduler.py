@@ -7,7 +7,7 @@
 import os
 
 import imgkit
-import oss2
+# import oss2
 import redis
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -19,7 +19,7 @@ from apscheduler.jobstores.redis import *
 from junyang_spider.libs.db_by_ssh import DBSSHHelper
 from hashlib import md5
 from bs4 import BeautifulSoup as bs
-from bs4 import CData
+
 import urllib.parse
 import time
 import re
@@ -218,23 +218,29 @@ def update_top_search():
 
 
 def crawl_hunan_policy():
-    url = "https://www.hneeb.cn/hnxxg/1/38/list.html"
+    url = "https://www.hneeb.cn/hnxxg/741/742/index.htm"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
     }
 
     res = requests.get(url, headers=headers)
     soup = bs(res.text, "lxml")
-    li_list = soup.select('div.zklb_list li')
+    li_list = soup.select('div.content-area.news-list-wrap.inner-news-list >ul li')
     params = []
-    base_url = "https://www.hneeb.cn/hnxxg/1/38/"
+    base_url = "https://www.hneeb.cn/hnxxg/741/742/"
+
     for li in li_list:
+
         title = li.select_one("a").get_text()
-        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        title_new = "湖南" + li.select_one("a").get_text()
+        title_md5 = md5(title_new.encode("utf-8")).hexdigest()
         if not my_redis.hexists('province_policy', title_md5):
-            url = base_url + li.select_one("a").get("href")
+            if li.select_one("a").get("href").find("http") == -1:
+                url = base_url + li.select_one("a").get("href")
+            else:
+                url=li.select_one("a").get("href")
             create_time = li.select_one("span").text.replace("【", "").replace("】", "")
-            my_redis.hset('province_policy', title_md5, create_time + title)
+            my_redis.hset('province_policy', title_md5, create_time + title_new)
             params.append({
                 "title": title,
                 "link": url,
@@ -257,11 +263,13 @@ def crawl_gd_policy():
     params = []
     for li in li_list:
         title = li.select_one("a").get_text()
-        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        title_new = "广东" + li.select_one("a").get_text()
+
+        title_md5 = md5(title_new.encode("utf-8")).hexdigest()
         if not my_redis.hexists('province_policy', title_md5):
             url = li.select_one("a").get("href")
             create_time = li.select_one("span.time").text
-            my_redis.hset('province_policy', title_md5, create_time + title)
+            my_redis.hset('province_policy', title_md5, create_time + title_new)
             params.append({
                 "title": title,
                 "link": url,
@@ -273,7 +281,7 @@ def crawl_gd_policy():
 
 
 def crawl_hb_policy():
-    url = "http://gaokao.hbccks.cn/zxzc/gkzx/"
+    url = "http://www.hbksw.com/information_list_12.html"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7",
@@ -282,21 +290,26 @@ def crawl_hb_policy():
 
     res = requests.get(url, headers=headers)
 
-    soup = bs(res.content.decode("gbk"), "lxml")
-    #print(soup)
-    li_list = soup.select("ul-h li")
+    soup = bs(res.text, "lxml")
+    # print(soup)
+    tr_list = soup.select("#nav43 tr")
 
     params = []
-    for li in li_list:
-        title = li.select_one("a").get_text()
-        title_md5 = md5(title.encode("utf-8")).hexdigest()
+    i = 0
+    for tr in tr_list:
+        i += 1
+        if i > 8:
+            break
+        title = tr.select_one("a").get_text().strip()
+        title_new = "湖北" + tr.select_one("a").get_text().strip()
+        title_md5 = md5(title_new.encode("utf-8")).hexdigest()
         # print(title)
         # print(url, create_time)
         if not my_redis.hexists('province_policy', title_md5):
-            url = li.select_one("a").get("href")
-            create_time = li.select_one("span").text.replace("/", "-")
+            url = tr.select_one("a").get("href")
+            create_time = "2022-" + tr.select_one("td:nth-child(2)").text.strip()
             # print(url,create_time)
-            my_redis.hset('province_policy', title_md5, create_time + title)
+            my_redis.hset('province_policy', title_md5, create_time + title_new)
             params.append({
                 "title": title,
                 "link": url,
@@ -324,15 +337,17 @@ def crawl_fj_policy():
     params = []
     for li in li_list:
         title = li.get("title")
+        title_new = "福建" + li.get("title")
+
         # print(title)
-        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        title_md5 = md5(title_new.encode("utf-8")).hexdigest()
         # print(title)
         if not my_redis.hexists('province_policy', title_md5):
             url = li.get("href")
             create_time = year + "-" + li.select_one("span").text.replace("[", "").replace("]", "")
             # print(url,create_time)
             # print(url,create_time)
-            my_redis.hset('province_policy', title_md5, create_time + title)
+            my_redis.hset('province_policy', title_md5, create_time + title_new)
             params.append({
                 "title": title,
                 "link": url,
@@ -359,14 +374,15 @@ def crawl_gz_policy():
     params = []
     for li in li_list:
         title = li.select_one("a").get('title')
-        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        title_new = "贵州" + li.select_one("a").get('title')
+        title_md5 = md5(title_new.encode("utf-8")).hexdigest()
         # print(title)
 
         if not my_redis.hexists('province_policy', title_md5):
             create_time = li.select_one("span.news_date").text
             # print(url,create_time)
             url = li.select_one("a").get("href")
-            my_redis.hset('province_policy', title_md5, create_time + title)
+            my_redis.hset('province_policy', title_md5, create_time + title_new)
             params.append({
                 "title": title,
                 "link": url,
@@ -392,15 +408,16 @@ def crawl_yn_policy():
     li_list = soup.select("div.listbox > a")
     params = []
     for li in li_list:
-        title = li.select_one("h2").get_text()
-        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        title =  li.select_one("h2").get_text()
+        title_new = "云南" + li.select_one("h2").get_text()
+        title_md5 = md5(title_new.encode("utf-8")).hexdigest()
         # print(title)
 
         if not my_redis.hexists('province_policy', title_md5):
             create_time = li.select_one("em").text.replace("年", "-").replace("月", "-").replace("日", "-")
             # print(url,create_time)
             url = li.get("href")
-            my_redis.hset('province_policy', title_md5, create_time + title)
+            my_redis.hset('province_policy', title_md5, create_time + title_new)
             params.append({
                 "title": title,
                 "link": url,
@@ -431,12 +448,13 @@ def crawl_jx_policy():
         if count > 20:
             break
         li = bs(data, "lxml")
-        title = li.select_one("a").get("title")
-        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        title =  li.select_one("a").get("title")
+        title_new = "江西" + li.select_one("a").get("title")
+        title_md5 = md5(title_new.encode("utf-8")).hexdigest()
         if not my_redis.hexists('province_policy', title_md5):
             url = li.select_one("a").get("href")
             create_time = li.select_one("div.content_right_date").text.replace(" ", "")
-            my_redis.hset('province_policy', title_md5, create_time + title)
+            my_redis.hset('province_policy', title_md5, create_time + title_new)
             params.append({
                 "title": title,
                 "link": url,
@@ -622,74 +640,74 @@ def get_colleges():
     return result_dict
 
 
-def update_province_policy_linux():
-    auth = oss2.Auth('LTAI4Fg3MtymYqu8kuqe8vDU', 'mBrPMusVDYr9P4q3dIjHOW6xTexdbA')
-    # Endpoint以杭州为例，其它Region请按实际情况填写。
-    bucket = oss2.Bucket(auth, 'http://oss-cn-huhehaote.aliyuncs.com', 'zhiya-data')
-    db_helper = DBSSHHelper()
-    db_helper.connection_database(db="oms")
-    sql = "select id,link from province_policy where  image_url is null"
-    source_data = db_helper.select_all(sql)
-    path_wkimg = "/usr/local/bin/wkhtmltoimage"
-    cfg = imgkit.config(wkhtmltoimage=path_wkimg)
-    update_sql = "update province_policy set image_url=%s where id=%s"
-    for data in source_data:
-        ids = data['id']
-        link = data['link']
-        image_name = "image/" + str(ids) + ".jpg"
-        try:
-            imgkit.from_url(link, image_name, config=cfg)
-            bucket.put_object_from_file("oms/policy/" + str(ids) + ".jpg", image_name)
-            db_helper.execute_one(update_sql, (
-                "https://zhiya-data.oss-cn-huhehaote.aliyuncs.com/oms/policy/" + str(ids) + ".jpg", ids))
-            os.remove(image_name)
-        except BaseException as e:
-
-            if os.path.exists(image_name):
-                bucket.put_object_from_file("oms/policy/" + str(ids) + ".jpg", image_name)
-                db_helper.execute_one(update_sql, (
-                    "https://zhiya-data.oss-cn-huhehaote.aliyuncs.com/oms/policy/" + str(ids) + ".jpg", ids))
-                os.remove(image_name)
-    db_helper.close_database()
+# def update_province_policy_linux():
+#     auth = oss2.Auth('LTAI4Fg3MtymYqu8kuqe8vDU', 'mBrPMusVDYr9P4q3dIjHOW6xTexdbA')
+#     # Endpoint以杭州为例，其它Region请按实际情况填写。
+#     bucket = oss2.Bucket(auth, 'http://oss-cn-huhehaote.aliyuncs.com', 'zhiya-data')
+#     db_helper = DBSSHHelper()
+#     db_helper.connection_database(db="oms")
+#     sql = "select id,link from province_policy where  image_url is null"
+#     source_data = db_helper.select_all(sql)
+#     path_wkimg = "/usr/local/bin/wkhtmltoimage"
+#     cfg = imgkit.config(wkhtmltoimage=path_wkimg)
+#     update_sql = "update province_policy set image_url=%s where id=%s"
+#     for data in source_data:
+#         ids = data['id']
+#         link = data['link']
+#         image_name = "image/" + str(ids) + ".jpg"
+#         try:
+#             imgkit.from_url(link, image_name, config=cfg)
+#             bucket.put_object_from_file("oms/policy/" + str(ids) + ".jpg", image_name)
+#             db_helper.execute_one(update_sql, (
+#                 "https://zhiya-data.oss-cn-huhehaote.aliyuncs.com/oms/policy/" + str(ids) + ".jpg", ids))
+#             os.remove(image_name)
+#         except BaseException as e:
+#
+#             if os.path.exists(image_name):
+#                 bucket.put_object_from_file("oms/policy/" + str(ids) + ".jpg", image_name)
+#                 db_helper.execute_one(update_sql, (
+#                     "https://zhiya-data.oss-cn-huhehaote.aliyuncs.com/oms/policy/" + str(ids) + ".jpg", ids))
+#                 os.remove(image_name)
+#     db_helper.close_database()
 
 
 if __name__ == '__main__':
-    # crawl_jx_policy()
-    # crawl_yn_policy()
-    # crawl_gz_policy()
-    # crawl_fj_policy()
-    # crawl_hunan_policy()
-    # crawl_hb_policy()
-    # crawl_gd_policy()
-    conf = {
-        'host': "159.75.224.137",
-        'port': 6399,
-
-        'password': "rYa+wq10dFTWzYz8FeZgsWRygyKfLKULSRdKfRnEgSk=",
-        'decode_responses': True
-    }
-    # # executors = {
-    # #     'default': ThreadPoolExecutor(10),  # 默认线程数
-    # #     'processpool': ProcessPoolExecutor(3)  # 默认进程
-    # # }
+    crawl_jx_policy()
+    crawl_yn_policy()
+    crawl_gz_policy()
+    crawl_fj_policy()
+    crawl_hunan_policy()
+    crawl_hb_policy()
+    crawl_gd_policy()
+    # conf = {
+    #     'host': "159.75.224.137",
+    #     'port': 6399,
+    #
+    #     'password': "rYa+wq10dFTWzYz8FeZgsWRygyKfLKULSRdKfRnEgSk=",
+    #     'decode_responses': True
+    # }
+    # # # executors = {
+    # # #     'default': ThreadPoolExecutor(10),  # 默认线程数
+    # # #     'processpool': ProcessPoolExecutor(3)  # 默认进程
+    # # # }
     jobstores = {
         'redis': RedisJobStore(db=3, **conf),
 
     }
-    # #
-    # # # job_defaults = {
-    # # #     'coalesce': False,
-    # # #     'max_instances': 3
-    # # # }
+    # # #
+    # # # # job_defaults = {
+    # # # #     'coalesce': False,
+    # # # #     'max_instances': 3
+    # # # # }
     scheduler = BlockingScheduler(jobstores=jobstores)
     scheduler.add_job(update_article_info, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(update_top_search, 'interval', jobstore='redis', days=7)
-    scheduler.add_job(update_province_policy_linux, 'interval', jobstore='redis', minutes=30)
-    scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_hb_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_fj_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_jx_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_gz_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.start()
+    # scheduler.add_job(update_top_search, 'interval', jobstore='redis', days=7)
+    # scheduler.add_job(update_province_policy_linux, 'interval', jobstore='redis', minutes=30)
+    # scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_hb_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_fj_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_jx_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_gz_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.start()

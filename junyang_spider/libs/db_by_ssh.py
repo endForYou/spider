@@ -7,6 +7,7 @@
 import traceback
 
 import pymysql
+import pymysql.cursors
 from sshtunnel import SSHTunnelForwarder
 import os
 
