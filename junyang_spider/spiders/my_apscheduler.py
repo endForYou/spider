@@ -672,26 +672,26 @@ def get_colleges():
 
 
 if __name__ == '__main__':
-    crawl_jx_policy()
-    crawl_yn_policy()
-    crawl_gz_policy()
-    crawl_fj_policy()
-    crawl_hunan_policy()
-    crawl_hb_policy()
-    crawl_gd_policy()
-    # conf = {
-    #     'host': "159.75.224.137",
-    #     'port': 6399,
-    #
-    #     'password': "rYa+wq10dFTWzYz8FeZgsWRygyKfLKULSRdKfRnEgSk=",
-    #     'decode_responses': True
-    # }
+    # crawl_jx_policy()
+    # crawl_yn_policy()
+    # crawl_gz_policy()
+    # crawl_fj_policy()
+    # crawl_hunan_policy()
+    # crawl_hb_policy()
+    # crawl_gd_policy()
+    conf = {
+        'host': "159.75.224.137",
+        'port': 6399,
+
+        'password': "rYa+wq10dFTWzYz8FeZgsWRygyKfLKULSRdKfRnEgSk=",
+        'decode_responses': True
+    }
     # # # executors = {
     # # #     'default': ThreadPoolExecutor(10),  # 默认线程数
     # # #     'processpool': ProcessPoolExecutor(3)  # 默认进程
     # # # }
     jobstores = {
-        'redis': RedisJobStore(db=3, **conf),
+        'redis': RedisJobStore(db=4, **conf),
 
     }
     # # #
@@ -699,8 +699,9 @@ if __name__ == '__main__':
     # # # #     'coalesce': False,
     # # # #     'max_instances': 3
     # # # # }
-    scheduler = BlockingScheduler(jobstores=jobstores)
-    scheduler.add_job(update_article_info, 'cron', jobstore='redis', hour=8)
+    scheduler = BlockingScheduler(jobstores=jobstores,timezone='Asia/Shanghai')
+
+    scheduler.add_job(update_article_info, 'interval', jobstore='redis', name="front", minutes=2)
     # scheduler.add_job(update_top_search, 'interval', jobstore='redis', days=7)
     # scheduler.add_job(update_province_policy_linux, 'interval', jobstore='redis', minutes=30)
     # scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
@@ -710,4 +711,4 @@ if __name__ == '__main__':
     # scheduler.add_job(crawl_jx_policy, 'cron', jobstore='redis', hour=8)
     # scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
     # scheduler.add_job(crawl_gz_policy, 'cron', jobstore='redis', hour=8)
-    # scheduler.start()
+    scheduler.start()
