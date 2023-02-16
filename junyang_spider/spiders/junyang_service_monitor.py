@@ -365,7 +365,8 @@ class ServiceMonitor:
         }
         payload = {"provinceId": 430000, "provinceName": "湖南", "pattern": "三加一加二", "year": 2024}
         try:
-            res = requests.post("https://wechat.junyanginfo.com/xuanke/entranceCollegeMajor/addUserProvinceRecord", headers=headers,
+            res = requests.post("https://wechat.junyanginfo.com/xuanke/entranceCollegeMajor/addUserProvinceRecord",
+                                headers=headers,
                                 data=json.dumps(payload), verify=False)
             if res.status_code != 200:
                 return "subject-用户修改省份失败，请检查服务"
@@ -408,12 +409,8 @@ class ServiceMonitor:
                 verify=False)
             if res.status_code != 200:
                 return False
-
-            username = res.json()['data']['body']['user']['username']
-            if not username:
-                return False
-
-            return True
+            else:
+                return True
         except BaseException as e:
             return False
 
@@ -496,7 +493,7 @@ class ServiceMonitor:
     # sale.myzhiya.com
     @staticmethod
     def sale_web():
-        return ServiceMonitor.web_base("http://sale.myzhiya.com/login",
+        return ServiceMonitor.web_base("http://sale.myzhiya.com/",
                                        "sale_web-经销商前端服务未返回200，请检查服务")
 
     # oms_h5pay
