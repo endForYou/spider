@@ -9,6 +9,14 @@ import scrapy
 from scrapy.pipelines.files import FilesPipeline
 
 
+class ImgsItem(scrapy.Item):
+    # define the fields for your item here like:
+    # name = scrapy.Field()
+    img_src = scrapy.Field()
+    # images = scrapy.Field()
+    # image_paths = scrapy.Field()
+
+
 class JunyangSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()

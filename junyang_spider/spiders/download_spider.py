@@ -14,7 +14,7 @@
 import scrapy
 from junyang_spider.items import FileDownloadItem
 import csv
-import pandas as pd
+# import pandas as pd
 
 
 class DownloadSpider(scrapy.Spider):
@@ -29,7 +29,7 @@ class DownloadSpider(scrapy.Spider):
     # file = open("paper_file.csv", 'r', encoding='utf-8')
     #
     # csv_file = list(csv.reader(file))
-    df = pd.read_csv("paper_file.csv")
+    # df = pd.read_csv("paper_file.csv")
 
     def start_requests(self):
         print(self.df[1:100])
