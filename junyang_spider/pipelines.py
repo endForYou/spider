@@ -1,15 +1,30 @@
 # -*- coding: utf-8 -*-
 import pymysql, pymongo, re
+from scrapy.pipelines.images import ImagesPipeline
 from twisted.internet.threads import deferToThread
 from twisted.enterprise import adbapi
-from pymysql.err import IntegrityError, ProgrammingError
-from scrapy.exceptions import CloseSpider
+import scrapy
 
 
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+class ImgsPipLine(ImagesPipeline):
+    def get_media_requests(self, item, info):
+
+        yield scrapy.Request(url=item['img_src'])
+
+    # 返回图片名称即可
+
+    # def file_path(self, request, response=None, info=None):
+    #     item = request.meta['item']
+    #     print('########', item)
+    #     filePath = item['img_src']
+    #     return filePath
+
+    def item_completed(self, results, item, info):
+        return item
 
 
 class JunyangSpiderPipeline(object):

@@ -40,14 +40,14 @@ MEDIA_ALLOW_REDIRECTS = True
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 1
+# CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 2.0
+# DOWNLOAD_DELAY = 2.0
 # 0.5 * DOWNLOAD_DELAY和1.5 * 之间的随机间隔
-RANDOMIZE_DOWNLOAD_DELAY = True
+# RANDOMIZE_DOWNLOAD_DELAY = True
 
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
@@ -63,7 +63,7 @@ COOKIES_ENABLED = False
 DEFAULT_REQUEST_HEADERS = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
     'Cookie': 'UM_distinctid=1736abb707db85-0398b059c5da14-b7a1334-1fa400-1736abb707eb32; connect.sid=s%3Aos1S0a4z2t1fkXNlG0Xu5g1hb_XWu3QA.CRJ%2FVnjJmGTS9MdyVVu40w2f9csUe5urXWf%2F%2Fmrf1AE; youzy.pv4y.uid=RGcXIY8EemSfeAQVvj1f1w==; youzy.pv4y.type=toC',
-    'Content-Type': 'application/json'
+    # 'Content-Type': 'application/json'
 }
 
 # Enable or disable spider middlewares
@@ -97,10 +97,11 @@ ITEM_PIPELINES = {
     # 'junyang_spider.pipelines.files.FilesPipeline': 1
     # 'junyang_spider.pipelines.RedisPipeline': 300,
     # 'junyang_spider.pipelines.NcdaPipeline': 300,
-    'junyang_spider.pipelines.YzyCollegePipeline': 300,
-    'junyang_spider.pipelines.YzyCollegeDetailPipline': 200,
-    'junyang_spider.pipelines.YzyCollegeEnrollCodePipline': 100,
-    'junyang_spider.pipelines.YzyCollegeScorelinePipline': 100,
+    # 'junyang_spider.pipelines.YzyCollegePipeline': 300,
+    # 'junyang_spider.pipelines.YzyCollegeDetailPipline': 200,
+    # 'junyang_spider.pipelines.YzyCollegeEnrollCodePipline': 100,
+    # 'junyang_spider.pipelines.YzyCollegeScorelinePipline': 100,
+    'junyang_spider.pipelines.ImgsPipLine': 100,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -156,3 +157,7 @@ MYSQL_CHARSET = 'utf8'
 # MONGO_URI = "mongodb://root:{pwd}@39.104.185.107:27017/".format(pwd=quote_plus("luoziming@2019!"))
 # MONGO_DATABASE = '51Job'
 # FILE_STORE = 'D:\\totransfer'
+#设置图片下载路径
+IMAGES_STORE = 'D:\\file\\download'
+# 过期天数
+IMAGES_EXPIRES = 90  #90天内抓取的都不会被重抓

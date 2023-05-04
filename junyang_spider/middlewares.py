@@ -6,12 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-import requests
-import random
-from junyang_spider.libs import proxys
-import base64
 
-my_proxy = proxys.Proxy()
+
+# my_proxy = proxys.Proxy()
 
 
 class JunyangSpiderSpiderMiddleware(object):
@@ -67,9 +64,6 @@ class JunyangSpiderDownloaderMiddleware(object):
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
 
-    def __init__(self):
-        self.proxy_id = None
-
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
@@ -79,19 +73,19 @@ class JunyangSpiderDownloaderMiddleware(object):
 
     def process_request(self, request, spider):
         # print(22222222222222)
-        proxy_dict = my_proxy.get_proxys_from_mysql(1)
-        # print(proxy_dict,1111111111111)
-        host = proxy_dict['proxy']
-        protocol = "https"
-        # proxy="45.76.114.249:8080"
-        if protocol == "https":
-            request.meta['proxy'] = "https://{}".format(host)
-        else:
-            request.meta['proxy'] = "http://{}".format(host)
-        # print(request.meta['proxy'])
-        print(request.headers)
-
-        self.proxy_id = proxy_dict['id']
+        # proxy_dict = my_proxy.get_proxys_from_mysql(1)
+        # # print(proxy_dict,1111111111111)
+        # host = proxy_dict['proxy']
+        # protocol = "https"
+        # # proxy="45.76.114.249:8080"
+        # if protocol == "https":
+        #     request.meta['proxy'] = "https://{}".format(host)
+        # else:
+        #     request.meta['proxy'] = "http://{}".format(host)
+        # # print(request.meta['proxy'])
+        # print(request.headers)
+        #
+        # self.proxy_id = proxy_dict['id']
         # Called for each request that goes through the downloader
         # middleware.
 
@@ -105,19 +99,19 @@ class JunyangSpiderDownloaderMiddleware(object):
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
-        if response.url.find("denied") != -1 or response.status not in (200, 302, 301):
-            # delete_proxy(proxy=self.proxy)
-            # proxy = get_proxy().get("proxy")
-            my_proxy.update_proxys_fail_count(self.proxy_id)
-            proxy_dict = my_proxy.get_proxys_from_mysql(1)
-            host = proxy_dict['proxy']
-            protocol = "https"
-            # proxy="45.76.114.249:8080"
-            if protocol == "https":
-                request.meta['proxy'] = "https://{}".format(host)
-            else:
-                request.meta['proxy'] = "http://{}".format(host)
-            return request
+        # if response.url.find("denied") != -1 or response.status not in (200, 302, 301):
+        #     # delete_proxy(proxy=self.proxy)
+        #     # proxy = get_proxy().get("proxy")
+        #     my_proxy.update_proxys_fail_count(self.proxy_id)
+        #     proxy_dict = my_proxy.get_proxys_from_mysql(1)
+        #     host = proxy_dict['proxy']
+        #     protocol = "https"
+        #     # proxy="45.76.114.249:8080"
+        #     if protocol == "https":
+        #         request.meta['proxy'] = "https://{}".format(host)
+        #     else:
+        #         request.meta['proxy'] = "http://{}".format(host)
+        #     return request
         # Must either;
         # - return a Response object
         # - return a Request object
@@ -134,15 +128,15 @@ class JunyangSpiderDownloaderMiddleware(object):
         # - return a Request object: stops process_exception() chain
         # print(self.proxy_id,111111)
         # print(exception)
-        my_proxy.update_proxys_fail_count(self.proxy_id)
-        proxy_dict = my_proxy.get_proxys_from_mysql(1)
-        host = proxy_dict['proxy']
-        protocol = "https"
-        # proxy="45.76.114.249:8080"
-        if protocol == "https":
-            request.meta['proxy'] = "https://{}".format(host)
-        else:
-            request.meta['proxy'] = "http://{}".format(host)
+        # my_proxy.update_proxys_fail_count(self.proxy_id)
+        # proxy_dict = my_proxy.get_proxys_from_mysql(1)
+        # host = proxy_dict['proxy']
+        # protocol = "https"
+        # # proxy="45.76.114.249:8080"
+        # if protocol == "https":
+        #     request.meta['proxy'] = "https://{}".format(host)
+        # else:
+        #     request.meta['proxy'] = "http://{}".format(host)
         return request
 
     def spider_opened(self, spider):
@@ -236,9 +230,9 @@ class JunyangSpiderFixedDownloaderMiddleware(object):
         return s
 
     def process_request(self, request, spider):
-        proxy = my_proxy.get_random_proxy_from_constant_proxys()
-        request.meta['proxy'] = "http://{}".format(proxy)
-        # print(request.meta['proxy'])
+        # proxy = my_proxy.get_random_proxy_from_constant_proxys()
+        # request.meta['proxy'] = "http://{}".format(proxy)
+        # # print(request.meta['proxy'])
         # Called for each request that goes through the downloader
         # middleware.
 

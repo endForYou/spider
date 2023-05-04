@@ -38,7 +38,7 @@ base_url = "https://www.ewt360.com"
 #
 # insert_sql = "insert into paper_file(data_category,data_type,version,subject,grade,upload_time,url) values(%s,%s,%s,%s,%s,%s,%s)"
 #
-out = open("paper_file_province.csv", 'a', newline='', encoding='utf-8')
+out = open("../spiders/paper_file_province.csv", 'a', newline='', encoding='utf-8')
 head = ["file_name", "province", ]
 csv_write = csv.writer(out, dialect='excel')
 csv_write.writerow(head)
