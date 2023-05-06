@@ -13,26 +13,27 @@ import datetime
 from hashlib import md5
 from junyang_spider.libs.db_by_ssh import DBSSHHelper
 
+my_redis = redis.StrictRedis(db=2, host="1.14.216.221", port=6379,
+                             password="cA0POXt/V4o18USu", decode_responses=True)
+
 
 def crawl_hunan_policy():
     url = "https://www.hneeb.cn/hnxxg/1/38/list.html"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
     }
-    my_redis = redis.StrictRedis(db=2, host="42.194.210.56", port=6399,
-                                 password="junyang@139", decode_responses=True)
+
     res = requests.get(url, headers=headers)
     soup = bs(res.text, "lxml")
     li_list = soup.select('div.zklb_list li')
     params = []
-    base_url="https://www.hneeb.cn/hnxxg/1/38/"
+    base_url = "https://www.hneeb.cn/hnxxg/1/38/"
     for li in li_list:
         title = li.select_one("a").get_text()
         title_md5 = md5(title.encode("utf-8")).hexdigest()
         if not my_redis.hexists('province_policy', title_md5):
-
-            url = base_url+li.select_one("a").get("href")
-            create_time = li.select_one("span").text.replace("【","").replace("】","")
+            url = base_url + li.select_one("a").get("href")
+            create_time = li.select_one("span").text.replace("【", "").replace("】", "")
             my_redis.hset('province_policy', title_md5, create_time + title)
             params.append({
                 "title": title,
@@ -49,8 +50,7 @@ def crawl_gd_policy():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
     }
-    my_redis = redis.StrictRedis(db=2, host="42.194.210.56", port=6399,
-                                 password="junyang@139", decode_responses=True)
+
     res = requests.get(url, headers=headers)
     soup = bs(res.text, "lxml")
     li_list = soup.select('div.content > ul.list > li')
@@ -59,7 +59,6 @@ def crawl_gd_policy():
         title = li.select_one("a").get_text()
         title_md5 = md5(title.encode("utf-8")).hexdigest()
         if not my_redis.hexists('province_policy', title_md5):
-
             url = li.select_one("a").get("href")
             create_time = li.select_one("span.time").text
             my_redis.hset('province_policy', title_md5, create_time + title)
@@ -68,6 +67,33 @@ def crawl_gd_policy():
                 "link": url,
                 "create_time": create_time,
                 "province_id": 440000
+            })
+    if params:
+        insert_into_province_policy(params)
+
+
+def crawl_yn_policy():
+    url = "https://www.ynzs.cn/html/web/zkxw/index.html"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+    }
+
+    res = requests.get(url, headers=headers)
+    soup = bs(res.text, "lxml")
+    li_list = soup.select('div.listbox > a')
+    params = []
+    for li in li_list:
+        title = li.select_one("div.clist > h2").get_text()
+        title_md5 = md5(title.encode("utf-8")).hexdigest()
+        if not my_redis.hexists('province_policy', title_md5):
+            url = li.get("href")
+            create_time = li.select_one("div.clist > em").text
+            my_redis.hset('province_policy', title_md5, create_time + title)
+            params.append({
+                "title": title,
+                "link": url,
+                "create_time": create_time,
+                "province_id": 530000
             })
     if params:
         insert_into_province_policy(params)
@@ -101,10 +127,10 @@ def insert_into_province_policy(data_list):
 
 if __name__ == '__main__':
     conf = {
-        'host': "42.194.210.56",
-        'port': 6399,
+        'host': "1.14.216.221",
+        'port': 6379,
 
-        'password': "junyang@139",
+        'password': "cA0POXt/V4o18USu",
         # 'decode_responses': True
     }
     # executors = {
@@ -124,5 +150,5 @@ if __name__ == '__main__':
 
     scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
     scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
-
+    scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
     scheduler.start()
