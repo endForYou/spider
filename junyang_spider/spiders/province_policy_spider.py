@@ -79,15 +79,17 @@ def crawl_yn_policy():
     }
 
     res = requests.get(url, headers=headers)
+    res.encoding = 'utf-8'
     soup = bs(res.text, "lxml")
     li_list = soup.select('div.listbox > a')
+
     params = []
     for li in li_list:
         title = li.select_one("div.clist > h2").get_text()
         title_md5 = md5(title.encode("utf-8")).hexdigest()
         if not my_redis.hexists('province_policy', title_md5):
             url = li.get("href")
-            create_time = li.select_one("div.clist > em").text
+            create_time = li.select_one("div.clist > em").text.replace("年","-").replace("月","-").replace("日","")
             my_redis.hset('province_policy', title_md5, create_time + title)
             params.append({
                 "title": title,
@@ -126,29 +128,30 @@ def insert_into_province_policy(data_list):
 
 
 if __name__ == '__main__':
-    conf = {
-        'host': "1.14.216.221",
-        'port': 6379,
-
-        'password': "cA0POXt/V4o18USu",
-        # 'decode_responses': True
-    }
-    # executors = {
-    #     'default': ThreadPoolExecutor(10),  # 默认线程数
-    #     'processpool': ProcessPoolExecutor(3)  # 默认进程
-    # }
-    jobstores = {
-        'redis': RedisJobStore(db=2, **conf),
-
-    }
+    crawl_yn_policy()
+    # conf = {
+    #     'host': "1.14.216.221",
+    #     'port': 6379,
     #
-    # # job_defaults = {
-    # #     'coalesce': False,
-    # #     'max_instances': 3
+    #     'password': "cA0POXt/V4o18USu",
+    #     # 'decode_responses': True
+    # }
+    # # executors = {
+    # #     'default': ThreadPoolExecutor(10),  # 默认线程数
+    # #     'processpool': ProcessPoolExecutor(3)  # 默认进程
     # # }
-    scheduler = BlockingScheduler(jobstores=jobstores)
-
-    scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
-    scheduler.start()
+    # jobstores = {
+    #     'redis': RedisJobStore(db=2, **conf),
+    #
+    # }
+    # #
+    # # # job_defaults = {
+    # # #     'coalesce': False,
+    # # #     'max_instances': 3
+    # # # }
+    # scheduler = BlockingScheduler(jobstores=jobstores)
+    #
+    # scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
+    # scheduler.start()
