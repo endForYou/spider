@@ -128,30 +128,29 @@ def insert_into_province_policy(data_list):
 
 
 if __name__ == '__main__':
-    crawl_yn_policy()
-    # conf = {
-    #     'host': "1.14.216.221",
-    #     'port': 6379,
-    #
-    #     'password': "cA0POXt/V4o18USu",
-    #     # 'decode_responses': True
+    conf = {
+        'host': "1.14.216.221",
+        'port': 6379,
+
+        'password': "cA0POXt/V4o18USu",
+        # 'decode_responses': True
+    }
+    # executors = {
+    #     'default': ThreadPoolExecutor(10),  # 默认线程数
+    #     'processpool': ProcessPoolExecutor(3)  # 默认进程
     # }
-    # # executors = {
-    # #     'default': ThreadPoolExecutor(10),  # 默认线程数
-    # #     'processpool': ProcessPoolExecutor(3)  # 默认进程
+    jobstores = {
+        'redis': RedisJobStore(db=2, **conf),
+
+    }
+    #
+    # # job_defaults = {
+    # #     'coalesce': False,
+    # #     'max_instances': 3
     # # }
-    # jobstores = {
-    #     'redis': RedisJobStore(db=2, **conf),
-    #
-    # }
-    # #
-    # # # job_defaults = {
-    # # #     'coalesce': False,
-    # # #     'max_instances': 3
-    # # # }
-    # scheduler = BlockingScheduler(jobstores=jobstores)
-    #
-    # scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
-    # scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
-    # scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
-    # scheduler.start()
+    scheduler = BlockingScheduler(jobstores=jobstores)
+
+    scheduler.add_job(crawl_hunan_policy, 'cron', jobstore='redis', hour=8)
+    scheduler.add_job(crawl_gd_policy, 'cron', jobstore='redis', hour=8)
+    scheduler.add_job(crawl_yn_policy, 'cron', jobstore='redis', hour=8)
+    scheduler.start()
